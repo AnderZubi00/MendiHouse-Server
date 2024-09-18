@@ -2,8 +2,7 @@
 const Workout = require("../models/workoutModel")
 
 const getAllWorkouts = async () => {
-    try
-    {
+    try {
         const workouts = await Workout.find()
         return workouts
     } catch (error)
@@ -12,6 +11,17 @@ const getAllWorkouts = async () => {
     }
 }
 
+const getOneWorkout = async (workoutId) => {
+    try {
+        const workout = await Workout.findById(workoutId)
+        return workout
+    } catch (error)
+    {
+        throw error
+    }
+}
+
 module.exports = {
-    getAllWorkouts
+    getAllWorkouts,
+    getOneWorkout
 }

@@ -2,8 +2,8 @@
 const Workout = require("../database/Workout")
 
 const getAllWorkouts = async () => {
-    try
-    {
+
+    try {
         const allWorkouts = Workout.getAllWorkouts();
         return allWorkouts;
         
@@ -13,6 +13,19 @@ const getAllWorkouts = async () => {
     }
 }
 
+const getOneWorkout = async (workoutId) => {
+    
+    try {
+        const workout = Workout.getOneWorkout(workoutId);
+        return workout;
+        
+    } catch (error)
+    {
+        return error
+    }
+}
+
 module.exports =  {
-    getAllWorkouts
+    getAllWorkouts,
+    getOneWorkout
 }
