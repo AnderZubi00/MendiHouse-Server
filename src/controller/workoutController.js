@@ -130,7 +130,6 @@ const updateOneWorkout = async (req, res) => {
     }
 
     try {
-        console.log(`BODY: ${body}`)
         const updatedWorkout = await workoutService.updateOneWorkout(workoutId, body)
 
         if (!updatedWorkout)
@@ -157,9 +156,60 @@ const updateOneWorkout = async (req, res) => {
 }
 
 
+// -- DELETE -- //
+
+const deleteOneWorkout = async (req, res) => {
+    
+    const {params: {workoutId}} = req
+
+    if (!workoutId)
+    {
+        return res
+            .status(400)
+            .send({
+
+                status: "FAILED",
+                data: {error: "Parameter ':workoutId' can not be empty"}
+            })
+    }
+
+    try {
+
+        const deletedWorkout = workoutService.deleteOneWorkout(workoutId)
+
+        if (!deletedWorkout)
+        {
+            return res
+                    .status(404)
+                    .send({
+                        status: "FAILED",
+                        data: {error: `Can not find workout with the id '${workoutId}'`}
+                    })
+        }
+
+        res
+            .status(200)
+            .send({
+                status: "OK",
+                data: deletedWorkout
+            })
+
+    } catch (error) {
+        return res  
+                .status(error?.status || 500)
+                .send({
+                    status: "FAILED",
+                    message: "Error al realizar la petición",
+                    data: {error: error?.message || error}
+                })
+    }
+
+}
+
 module.exports = {
     getAllWorkouts,
     getOneWorkout,
     createNewWorkout,
-    updateOneWorkout
+    updateOneWorkout,
+    deleteOneWorkout
 }

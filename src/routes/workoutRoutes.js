@@ -13,5 +13,7 @@ router.post("/", workoutController.createNewWorkout)
 // -- PATCH (UPDATE) -- // 
 router.patch("/:workoutId", workoutController.updateOneWorkout)
 
+// -- DELETE -- // 
+router.delete("/:workoutId", workoutController.deleteOneWorkout)
 
 module.exports = router

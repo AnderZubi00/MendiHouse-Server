@@ -52,9 +52,22 @@ const updateOneWorkout = async (workoutId, changes) => {
     }
 }
 
+// -- DELETE -- //
+
+const deleteOneWorkout = async (workoutId) => {
+    try {
+        const deletedWorkout = Workout.deleteOneWorkout(workoutId)
+        return deletedWorkout
+    } catch (error) 
+    {
+        throw error
+    }
+}
+
 module.exports =  {
     getAllWorkouts,
     getOneWorkout,
     createNewWorkout,
-    updateOneWorkout
+    updateOneWorkout,
+    deleteOneWorkout
 }
