@@ -1,6 +1,8 @@
 
 const Workout = require("../database/Workout")
 
+// -- GET -- // 
+
 const getAllWorkouts = async () => {
 
     try {
@@ -12,6 +14,7 @@ const getAllWorkouts = async () => {
         return error
     }
 }
+
 
 const getOneWorkout = async (workoutId) => {
     
@@ -25,7 +28,33 @@ const getOneWorkout = async (workoutId) => {
     }
 }
 
+// -- POST -- // 
+
+const createNewWorkout = async (newWorkout) => {
+    try {
+        const createdWorkout = Workout.createNewWorkout(newWorkout)
+        return createdWorkout
+    } catch (error)
+    {
+        throw error
+    }
+}
+
+// -- PATCH (UPDATE) -- // 
+
+const updateOneWorkout = async (workoutId, changes) => {
+    try {
+        const updatedWorkout = Workout.updateOneWorkout(workoutId, changes)
+        return updatedWorkout
+    } catch (error)
+    {
+        throw error
+    }
+}
+
 module.exports =  {
     getAllWorkouts,
-    getOneWorkout
+    getOneWorkout,
+    createNewWorkout,
+    updateOneWorkout
 }

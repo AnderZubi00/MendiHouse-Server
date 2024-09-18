@@ -1,6 +1,8 @@
 
 const Workout = require("../models/workoutModel")
 
+// -- GET -- // 
+
 const getAllWorkouts = async () => {
     try {
         const workouts = await Workout.find()
@@ -21,7 +23,40 @@ const getOneWorkout = async (workoutId) => {
     }
 }
 
+// -- POST -- // 
+
+const createNewWorkout = async (newWorkout) => {
+
+    try
+    {
+        let workoutToInsert = new Workout(newWorkout)
+        const createdWorkout = await workoutToInsert.save()
+        return createdWorkout;
+
+    } catch (error)
+    {
+        throw error
+    }
+
+}
+
+// -- PATCH (UPDATE) -- // 
+
+const updateOneWorkout = async (workoutId, changes) => {
+    try {
+        let updatedWorkout = await Workout.findByIdAndUpdate(workoutId, {$set: changes}, {new: true})
+        return updatedWorkout
+    } catch (error)
+    {
+        throw error
+    }
+}
+
+
+
 module.exports = {
     getAllWorkouts,
-    getOneWorkout
+    getOneWorkout,
+    createNewWorkout,
+    updateOneWorkout
 }
