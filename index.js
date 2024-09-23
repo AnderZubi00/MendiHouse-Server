@@ -10,7 +10,7 @@ const app = express();
 app.use(express.json());
 
 // Route API
-app.use('/api/auth', authRoutes);
+app.use('/api/token', authRoutes);
 
 // Start the server
 const PORT = process.env.PORT || 3000;
