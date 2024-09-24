@@ -1,7 +1,5 @@
 const express = require('express');
 const bodyParser = require("body-parser");
-const mongoose = require("mongoose");
-const mongodbRoute = 'String de conexion con MongoDB';
 const dotenv = require('dotenv');
 const authRoutes = require('./src/routes/authRoutes');
 
@@ -12,7 +10,7 @@ const mongodbRoute = process.env.MONGO_URI;
 
 dotenv.config();
 
-const playerRouter = require("./routes/playerRoutes")
+const playerRouter = require("./src/routes/playerRoutes")
 
 const app = express();
 
