@@ -7,6 +7,8 @@ const authRoutes = require('./src/routes/authRoutes');
 
 dotenv.config();
 
+const playerRouter = require("./routes/playerRoutes")
+
 const app = express();
 
 // Middleware to parse JSON
@@ -17,6 +19,8 @@ app.use('/api/token', authRoutes);
 
 //Use bodyparser
 app.use(bodyParser.json());
+
+app.use("/api/players", playerRouter);
 
 // Start the server
 const PORT = process.env.PORT || 3000;
