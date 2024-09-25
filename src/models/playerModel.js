@@ -19,7 +19,7 @@ const playerSchema = new Schema({
     experience: Number,
     is_active: Boolean,
     profile: Object,
-    tasks: [Object],
+    tasks: Array,
     gold: Number,
     created_date: Date,
     socketId: String,

@@ -2,6 +2,7 @@ const playerService = require("../services/playerService");
 
 const getAllPlayers = async (req, res) => {
     try{
+
         const allPlayers = await playerService.getAllPlayers();
         if (allPlayers.length === 0) {
             return res.status(404).send({message: "Don't exist players"});
@@ -19,4 +20,4 @@ const getAllPlayers = async (req, res) => {
 
 module.exports = {
     getAllPlayers
-}
+};
