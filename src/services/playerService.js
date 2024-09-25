@@ -14,6 +14,23 @@ const getAllPlayers = async () => {
     }
 };
 
+const updateOrCreate = async () => {
+
+    try
+    {
+        console.log("Updating/Creating player from database");
+        const players = Player.getAllPlayers();
+        console.log("Players fetched:", players); 
+        return players;
+    }
+    catch (error)
+    {
+        throw error;
+    }
+};
+
+
+
 module.exports = {
     getAllPlayers
 }

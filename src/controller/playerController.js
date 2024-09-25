@@ -18,6 +18,33 @@ const getAllPlayers = async (req, res) => {
     }
 };
 
+const updateOrCreate = async (req, res) => {
+
+    try {
+
+        let loQueRecive = req // Da error porque le enviamos un JSON mal
+        console.log(loQueRecive);
+
+        res.send({ status: "Ok", data: loQueRecive });
+
+
+        // const allPlayers = await playerService.getAllPlayers();
+        // if (allPlayers.length === 0) {
+        //     return res.status(404).send({message: "Don't exist players"});
+        // }
+
+    } catch (error) {
+        res
+            .status(error?.status || 500)
+            .send( { status: "FAILED",
+                message: "Error at executing the petition:",
+                data: { error: error?.message || error}
+            });
+    }
+
+};
+
 module.exports = {
-    getAllPlayers
+    getAllPlayers,
+    updateOrCreate
 };
