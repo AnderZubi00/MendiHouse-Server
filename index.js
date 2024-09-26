@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require("body-parser");
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
+const cors = require('cors');
 
 //Import routes
 const authRoutes = require('./src/routes/authRoutes');
@@ -18,6 +19,9 @@ const mongodbRoute = process.env.MONGO_URI;
 
 //Inicialize app express
 const app = express();
+
+app.use(cors()); // Enable CORS for all requests
+app.use(express.json()); // Middleware to parse JSON requests
 
 // Middleware to parse JSON
 app.use(express.json());

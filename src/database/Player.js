@@ -13,6 +13,19 @@ const getAllPlayers = async () => {
     }
 };
 
+const createNewPlayer = async (newPlayer) => {
+    try {
+        let playerToInsert = new Player(newPlayer);
+        const createPlayer = await playerToInsert.save();
+        return createPlayer;
+    }
+    catch (error)
+    {
+        throw error;
+    }
+}
+
 module.exports = {
-    getAllPlayers
+    getAllPlayers,
+    createNewPlayer
 }

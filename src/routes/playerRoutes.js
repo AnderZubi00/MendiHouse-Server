@@ -5,6 +5,6 @@ const router = express.Router();
 const playerController = require("../controller/playerController");
 
 router.get("/", playerController.getAllPlayers);
-router.post("/", playerController.updateOrCreate);
+router.post("/", playerController.createNewPlayer);
 
 module.exports = router;
