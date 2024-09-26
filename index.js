@@ -1,4 +1,7 @@
 const express = require('express');
+const { createServer } = require("http");
+const { Server } = require("socket.io");
+
 const dotenv = require('dotenv');
 const authRoutes = require('./src/routes/authRoutes');
 
@@ -7,9 +10,23 @@ const mongodbRoute = process.env.MONGO_URI;
 //import bodyParser from "body-parser";
 
 
+
 dotenv.config();
 
 const app = express();
+
+const httpServer = createServer(app);
+const io = new Server(httpServer, { /* options */ });
+
+io.on("connection", (socket) => {
+  console.log("abjñn bñj");
+  
+});
+
+httpServer.listen(1452, () => {
+  console.log(`Server running on port 1452`);
+});
+
 
 //Use bodyparser
 //app.use(bodyParser.json());
@@ -26,6 +43,10 @@ const PORT_MONGO = 27017;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+
+
+
 
 
 async function start() {
