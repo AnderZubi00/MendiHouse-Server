@@ -19,13 +19,12 @@ const httpServer = createServer(app);
 const io = new Server(httpServer, { /* options */ });
 
 io.on("connection", (socket) => {
-  console.log("abjñn bñj");
-  
+  console.log("Connection made");
+  console.log(socket.id);
+  io.to(socket.id).emit("connection", `${socket.id}`);
 });
 
-httpServer.listen(1452, () => {
-  console.log(`Server running on port 1452`);
-});
+
 
 
 //Use bodyparser
@@ -40,11 +39,13 @@ app.use('/api/token', authRoutes);
 // Start the server
 const PORT = process.env.PORT || 3000;
 const PORT_MONGO = 27017;
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server running on port ${PORT}`);
-});
+// app.listen(PORT, '0.0.0.0', () => {
+//   console.log(`Server running on port ${PORT}`);
+// });
 
-
+httpServer.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server running on port ${PORT}`);
+  });
 
 
 
