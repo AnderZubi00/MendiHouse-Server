@@ -18,12 +18,23 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, { /* options */ });
 
+// Create a conection with a client device 
 io.on("connection", (socket) => {
+
   console.log("Connection made");
   console.log(socket.id);
+
+  // Return the socket Id  to the client using a socket
   io.to(socket.id).emit("connection", `${socket.id}`);
+  
+  // Add to listen to the function to update the socket Id of the client
+  socket.on("updateSocketId", (emailSocketId) => {
+  console.log("email --> "+ emailSocketId.email);
+  console.log("socketId --> "+ emailSocketId.socketId);
+  
 });
 
+});
 
 
 
