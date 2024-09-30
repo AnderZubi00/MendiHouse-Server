@@ -5,6 +5,12 @@ const { Server } = require("socket.io");
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 
+//Import function for update in MongoDB
+const { updatePlayer } = require('./src/database/Player');
+
+//Import model
+const Player = require('./src/models/playerModel');
+
 //Import routes
 const authRoutes = require('./src/routes/authRoutes');
 
@@ -34,12 +40,15 @@ io.on("connection", (socket) => {
     console.log("\nUpdate the socket id with the following data:");
     console.log("     email --> "+ emailSocketId.email);
     console.log("     socketId --> "+ emailSocketId.socketId);
-  
-});
+
+    //convert string to object
+    const socketIdObject = {socketId: emailSocketId.socketId};
+    //update the socketId
+    updatePlayer(emailSocketId.email, socketIdObject);
+    
+  });
 
 });
-
-
 
 //Use bodyparser (but express should be enough)
 //app.use(bodyParser.json());
