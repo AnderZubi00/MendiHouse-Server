@@ -13,6 +13,18 @@ const getAllPlayers = async () => {
     }
 };
 
+const getAllAcolytes = async () => {
+    try
+    {
+        const players = await Player.find({role:"ACOLYTE"});
+        return players;
+    }
+    catch (error)
+    {
+        throw error;
+    }
+};
+
 const createPlayer = async (newPlayer) => {
     try {
         console.log("Creating new Player. Email: ", newPlayer?.email);
@@ -81,6 +93,7 @@ const findPlayerByEmail = async (email) => {
 
 module.exports = {
     getAllPlayers,
+    getAllAcolytes,
     createPlayer,
     updatePlayer,
     findPlayerByEmail

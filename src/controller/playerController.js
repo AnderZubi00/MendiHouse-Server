@@ -18,6 +18,24 @@ const getAllPlayers = async (req, res) => {
     }
 };
 
+const getAllAcolytes = async (req, res) => {
+
+    try {
+        const allAcolytes = await playerService.getAllAcolytes();
+        if (allAcolytes.length === 0) {
+            return res.status(404).send({message: "Don't exist players"});
+        }
+        res.send({ status: "Ok", data: allAcolytes });
+    } catch (error) {
+        res
+            .status(error?.status || 500)
+            .send( { status: "FAILED",
+                message: "Error at executing the petition:",
+                data: { error: error?.message || error}
+            });
+    }
+};
+
 const updateOrCreate = async (req, res) => {
 
     console.log("========= UPDATE OR CREATE PLAYER =========");
@@ -75,5 +93,6 @@ const updateOrCreate = async (req, res) => {
 
 module.exports = {
     getAllPlayers,
+    getAllAcolytes,
     updateOrCreate
 };
