@@ -13,9 +13,11 @@ const getAllPlayers = async () => {
     }
 };
 
+// Function to get all the players with the role ACOLYTE
 const getAllAcolytes = async () => {
     try
     {
+        console.log("Getting all the players with the role ACOLYTE...");
         const players = await Player.find({role:"ACOLYTE"});
         return players;
     }

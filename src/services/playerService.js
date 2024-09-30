@@ -13,9 +13,10 @@ const getAllPlayers = async () => {
     }
 };
 
+// Service for the route to get all the players with the role ACOLYTE
 const getAllAcolytes = async () => {
     try {
-        console.log("Fetching all players from the database");
+        console.log("Fetching all players with the role ACOLYTE from the database");
         const players = await Player.getAllAcolytes();
         console.log("Players fetched:", players); 
         return players;

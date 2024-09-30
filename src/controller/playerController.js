@@ -18,6 +18,7 @@ const getAllPlayers = async (req, res) => {
     }
 };
 
+// Controler for the route to get all the players with the role ACOLYTE
 const getAllAcolytes = async (req, res) => {
 
     try {
