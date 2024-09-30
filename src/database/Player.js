@@ -34,28 +34,28 @@ const createPlayer = async (newPlayer) => {
     }
 }
 
-const updatePlayer = async (email, newPlayer) => {
+const updatePlayer = async (emailFilter, newPlayerData) => {
 
     try {
         
-        // Find the player by email and update with newPlayer data
+        // Find the player by field and update with newPlayer data
         const updatedPlayer = await Player.findOneAndUpdate(
-            { email: email },     // Filter (find player with this email)
-            { $set: newPlayer },  // '$use' is to merge only the specified fields in newPlayer
+            { email: emailFilter },     // Filter (find player with this field)
+            { $set: newPlayerData },  // '$use' is to merge only the specified fields in newPlayer
             { new: true }         // Return the updated document
         );
 
         // If no player is found, you might want to handle it
         if (!updatedPlayer) {
-            throw new Error(`Player with email ${email} not found.`);
+            throw new Error(`Player with email ${emailFilter} not found.`);
         }
 
-        console.log(`Player with email ${email} has been updated successfuly`);
+        console.log(`Player with email ${emailFilter} has been updated successfuly`);
 
         return updatedPlayer;
 
     } catch (error) {
-      console.error(`Error updating player with email ${email}:`, error);
+      console.error(`Error updating player with field ${emailFilter}:`, error);
       throw error;
     }
 };
