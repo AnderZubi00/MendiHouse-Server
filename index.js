@@ -5,6 +5,9 @@ const { Server } = require("socket.io");
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 
+//Import model
+const Player = require('./src/models/playerModel');
+
 //Import routes
 const authRoutes = require('./src/routes/authRoutes');
 
@@ -34,12 +37,32 @@ io.on("connection", (socket) => {
     console.log("\nUpdate the socket id with the following data:");
     console.log("     email --> "+ emailSocketId.email);
     console.log("     socketId --> "+ emailSocketId.socketId);
+
+    //updatePlayer(emailSocketId.email, emailSocketId.socketId);
   
-});
+    
+  });
 
 });
 
+const updatePlayer = async (email, socketId) => {
+  try {
+    // Find the user by email and update the socketId
+    const updatedUser = await Player.findOneAndUpdate(
+      { email: email },
+      { socketId: socketId },
+      { new: true, upsert: false } // new: true returns the updated document, upsert: false avoids creating new document if not found
+    );
 
+    if (updatedUser) {
+      console.log(`User socketId updated successfully for email: ${email}`);
+    } else {
+      console.log(`No user found with email: ${email}`);
+    }
+  } catch (error) {
+    console.error("Error updating socketId:", error.message);
+  }
+};
 
 //Use bodyparser (but express should be enough)
 //app.use(bodyParser.json());
