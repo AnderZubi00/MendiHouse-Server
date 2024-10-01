@@ -48,6 +48,14 @@ io.on("connection", (socket) => {
     
   });
 
+  // Escucha el evento "Acolite scanned"
+  socket.on("acoliteScanned", (data) => {
+    console.log("Acolite scanned:", data);
+
+     // Emitir un mensaje de confirmación al cliente
+     socket.emit("acoliteScannedResponse", { message: "Acolito scanned" });
+    });
+
 });
 
 //Use bodyparser (but express should be enough)
