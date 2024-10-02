@@ -48,6 +48,19 @@ io.on("connection", (socket) => {
     
   });
 
+  // Listen for the acolyte status changes from the client
+  socket.on('acolyteStatusChange', (acolyteData) => {
+    console.log('Acolyte status change received', acolyteData);
+
+    // Emit the updated acolyte status to all connected clients
+    io.emit('acolyteStatusUpdate', acolyteData)
+  });
+
+  //SOCKET DISCONNECTION
+  socket.on('disconnect', () => {
+    console.log('A user disconnected');
+  });
+
 });
 
 //Use bodyparser (but express should be enough)
