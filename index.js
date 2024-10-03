@@ -61,6 +61,10 @@ io.on("connection", (socket) => {
      // Emitir un mensaje de confirmación al cliente
      io.to(data.socket).emit("acoliteScannedResponse", { message: "acolyte successfully scanned" });
      io.to(socket.id).emit("acoliteScannedResponse", { message: "acolyte successfully scanned" });
+
+     // Send message to clients to refresh Mortimer's list. 
+     io.emit("refreshMortimerList", {});
+
     });
 
 });
