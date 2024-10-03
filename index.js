@@ -56,10 +56,11 @@ io.on("connection", (socket) => {
 
   // Escucha el evento "Acolite scanned"
   socket.on("acoliteScanned", (data) => {
-    console.log("Acolite scanned:", data);
+    console.log("Acolite scanned:", data.socket);
 
      // Emitir un mensaje de confirmación al cliente
-     io.to(data.socketId).emit("acoliteScannedResponse", { message: "acolyte successfully scanned" });
+     io.to(data.socket).emit("acoliteScannedResponse", { message: "acolyte successfully scanned" });
+     io.to(socket.id).emit("acoliteScannedResponse", { message: "acolyte successfully scanned" });
     });
 
 });
