@@ -46,17 +46,7 @@ const updateOrCreate = async (req, res) => {
         const playerData = req.body; // Get player data from the request body
         
         // Validating all required fields
-        if (!playerData?.email ||
-            !playerData?.name ||
-            !playerData?.email ||
-            !playerData?.level ||
-            !playerData?.experience || 
-            !playerData?.tasks ||
-            !playerData?.gold ||
-            !playerData?.attributes ||
-            !playerData?.equipment ||  
-            !playerData?.inventory  
-        ) {
+        if (!playerData?.email) {
             console.log("Error inserting Player: Email field not provided");
             return res
             .status(400)
