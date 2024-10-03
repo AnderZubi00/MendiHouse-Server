@@ -59,7 +59,7 @@ io.on("connection", (socket) => {
     console.log("Acolite scanned:", data);
 
      // Emitir un mensaje de confirmación al cliente
-     io.emit("acoliteScannedResponse", { message: "acolyte successfully scanned" });
+     io.to(data.socketId).emit("acoliteScannedResponse", { message: "acolyte successfully scanned" });
     });
 
 });
