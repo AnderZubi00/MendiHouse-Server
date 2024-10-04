@@ -15,6 +15,7 @@ const Player = require('./src/models/playerModel');
 const authRoutes = require('./src/routes/authRoutes');
 
 const playerRouter = require("./src/routes/playerRoutes");
+const { log } = require('console');
 
 //Connfigurate enviroment variables
 dotenv.config();
@@ -55,12 +56,21 @@ io.on("connection", (socket) => {
   });
 
   // Escucha el evento "Acolite scanned"
-  socket.on("acoliteScanned", (data) => {
+  socket.on("acoliteScanned", async (data) => {
+
+    await handleNavigateLaboratory(data.playerData);
+    
     console.log("Acolite scanned:", data.socket);
+
+    
 
      // Emitir un mensaje de confirmación al cliente
      io.to(data.socket).emit("acoliteScannedResponse", { message: "acolyte successfully scanned" });
+     console.log("data.socket: " + data.socket);
+     
      io.to(socket.id).emit("acoliteScannedResponse", { message: "acolyte successfully scanned" });
+     console.log("socket.id: " + socket.id);
+     
 
      // Send message to clients to refresh Mortimer's list. 
      io.emit("refreshMortimerList", {});
@@ -101,6 +111,18 @@ async function start() {
     
   }
 }
+const handleNavigateLaboratory = async (playerData) => {
+  console.log("Proceeding to update inInside");
+
+    let newPlayerData = {
+      isInside: !playerData.isInside
+    };
+    updatePlayer(playerData.email, newPlayerData);
+
+  console.log(`isInisde of player ${playerData.nickname} has been updated to ${newPlayerData.isInside}`);
+
+ 
+};
 
 start();
 
