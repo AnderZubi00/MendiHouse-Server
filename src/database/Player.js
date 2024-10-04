@@ -92,11 +92,30 @@ const findPlayerByEmail = async (email) => {
 
 };
 
+const findPlayerBySocketId = async (socketId) => {
+
+    try {
+        
+        console.log("Finding player by socketId: ", socketId);
+        let player = await Player.find({socketId: socketId});
+
+        // If there is no player with that email we return null
+        if (player.length==0) return null
+        return player;
+
+    } catch (error) {
+        console.error(`Error getting the player by socketId (${socketId}):`, error);
+        throw error;
+    }
+
+};
+
 
 module.exports = {
     getAllPlayers,
     getAllAcolytes,
     createPlayer,
     updatePlayer,
-    findPlayerByEmail
+    findPlayerByEmail,
+    findPlayerBySocketId
 }

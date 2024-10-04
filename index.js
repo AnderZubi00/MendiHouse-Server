@@ -6,7 +6,7 @@ const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 
 //Import function for update in MongoDB
-const { updatePlayer } = require('./src/database/Player');
+const { updatePlayer, findPlayerBySocketId } = require('./src/database/Player');
 
 //Import model
 const Player = require('./src/models/playerModel');
@@ -58,7 +58,7 @@ io.on("connection", (socket) => {
   // Escucha el evento "Acolite scanned"
   socket.on("acoliteScanned", async (data) => {
 
-    await handleNavigateLaboratory(data.playerData);
+    await handleNavigateLaboratory(data.socket);
     
     console.log("Acolite scanned:", data.socket);
 
@@ -111,7 +111,10 @@ async function start() {
     
   }
 }
-const handleNavigateLaboratory = async (playerData) => {
+const handleNavigateLaboratory = async (socketId) => {
+
+  const playerData = findPlayerBySocketId(socketId);
+
   console.log("Proceeding to update inInside");
 
     let newPlayerData = {
