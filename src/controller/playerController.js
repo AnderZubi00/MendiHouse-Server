@@ -65,7 +65,7 @@ const updateOrCreate = async (req, res) => {
         // If the Player does not exist, we create it.
         if (playerExists) { 
             console.log("The Player already exists, updating player...");
-            const updatedPlayer = await playerService.updatePlayer(playerData.email, playerData);
+            const updatedPlayer = await playerService.updatePlayerByEmail(playerData.email, playerData);
             return res.send({ status: "Ok", data: updatedPlayer });
 
         } else { 

@@ -48,7 +48,7 @@ const createPlayer = async (newPlayer) => {
     }
 }
 
-const updatePlayer = async (emailFilter, newPlayerData) => {
+const updatePlayerByEmail = async (emailFilter, newPlayerData) => {
 
     try {
         
@@ -64,21 +64,53 @@ const updatePlayer = async (emailFilter, newPlayerData) => {
             throw new Error(`Player with email ${emailFilter} not found.`);
         }
 
-        console.log(`Player with email ${emailFilter} has been updated successfuly`);
+        console.log(`Player with email ${emailFilter} has been updated successfuly to ${updatedPlayer.isInside}`);
 
         return updatedPlayer;
 
     } catch (error) {
-      console.error(`Error updating player with field ${emailFilter}:`, error);
+      console.log(`Error updating player with field ${emailFilter}:`, error);
       throw error;
     }
 };
+
+const toggleIsInsideByEmail = async (emailFilter) => {
+    
+    try {
+
+      const updatedPlayer = await Player.findOneAndUpdate(
+        { email: emailFilter }, // Filter to find the player by email
+        [
+          {
+            $set: {
+              isInside: { $not: '$isInside' } // Toggle the value of isInside
+            }
+          }
+        ],
+        { new: true } // Return the updated document
+      );
+  
+      // Handle the case where the player is not found
+      if (!updatedPlayer) {
+        throw new Error(`Player with email ${emailFilter} not found.`);
+      }
+  
+      console.log(`Player with email ${emailFilter} has toggled isInside to ${updatedPlayer.isInside}`);
+  
+      return updatedPlayer;
+  
+    } catch (error) {
+      console.log(`Error toggling isInside for player with email ${emailFilter}:`, error);
+      throw error;
+    }
+};
+  
 
 const findPlayerByEmail = async (email) => {
 
     try {
         
-        console.log("Finding player by email: ", email);
+        console.log("Getting data player by email: ", email);
         let player = await Player.find({email: email});
 
         // If there is no player with that email we return null
@@ -86,7 +118,7 @@ const findPlayerByEmail = async (email) => {
         return player;
 
     } catch (error) {
-        console.error(`Error getting the player by email (${email}):`, error);
+        console.log(`Error getting the player by email (${email}):`, error);
         throw error;
     }
 
@@ -97,6 +129,7 @@ module.exports = {
     getAllPlayers,
     getAllAcolytes,
     createPlayer,
-    updatePlayer,
-    findPlayerByEmail
+    updatePlayerByEmail,
+    findPlayerByEmail,
+    toggleIsInsideByEmail
 }

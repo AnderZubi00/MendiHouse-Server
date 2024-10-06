@@ -8,7 +8,7 @@ const getAllPlayers = async () => {
         console.log("Players fetched:", players); 
         return players;
     } catch (error) {
-        console.error("Error fetching players:", error);
+        console.log("Error fetching players:", error);
         throw error;
     }
 };
@@ -21,7 +21,7 @@ const getAllAcolytes = async () => {
         console.log("Players fetched:", players); 
         return players;
     } catch (error) {
-        console.error("Error fetching players:", error);
+        console.log("Error fetching players:", error);
         throw error;
     }
 };
@@ -54,18 +54,18 @@ const createPlayer = async (playerData) => {
         return newPlayer;
 
     } catch (error) {
-        console.error("Error creating player:", error);
+        console.log("Error creating player:", error);
         throw error;
     }
 };
 
-const updatePlayer = async (email, playerData) => {
+const updatePlayerByEmail = async (email, playerData) => {
     try {
         console.log(`Updating player with email: ${email}`);
-        const updatedPlayer = await Player.updatePlayer(email, playerData); 
+        const updatedPlayer = await Player.updatePlayerByEmail(email, playerData); 
         return updatedPlayer;
     } catch (error) {
-        console.error("Error updating player:", error);
+        console.log("Error updating player:", error);
         throw error;
     }
 };
@@ -75,7 +75,7 @@ const findPlayerByEmail = async (email) => {
         const player = await Player.findPlayerByEmail(email); 
         return player;
     } catch (error) {
-        console.error("Error finding player:", error);
+        console.log("Error finding player:", error);
         throw error;
     }
 };
@@ -85,6 +85,6 @@ module.exports = {
     getAllPlayers,
     getAllAcolytes,
     createPlayer,
-    updatePlayer,
+    updatePlayerByEmail,
     findPlayerByEmail,
 };

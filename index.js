@@ -6,7 +6,7 @@ const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 
 //Import function for update in MongoDB
-const { updatePlayer } = require('./src/database/Player');
+const { updatePlayerByEmail, findPlayerByEmail, toggleIsInsideByEmail } = require('./src/database/Player');
 
 //Import model
 const Player = require('./src/models/playerModel');
@@ -47,26 +47,51 @@ io.on("connection", (socket) => {
     console.log("     email --> "+ emailSocketId.email);
     console.log("     socketId --> "+ emailSocketId.socketId);
 
-    //convert string to object
+    // Convert string to object
     const socketIdObject = {socketId: emailSocketId.socketId};
-    //update the socketId
-    updatePlayer(emailSocketId.email, socketIdObject);
+
+    // Update the socketId
+    updatePlayerByEmail(emailSocketId.email, socketIdObject);
     
   });
 
-  // Escucha el evento "Acolite scanned"
-  socket.on("acoliteScanned", (data) => {
-    console.log("Acolite scanned:", data.socket);
+  socket.on("acolyteScanned", async (data) => {
 
-     // Emitir un mensaje de confirmación al cliente
-     io.to(data.socket).emit("acoliteScannedResponse", { message: "acolyte successfully scanned" });
-     io.to(socket.id).emit("acoliteScannedResponse", { message: "acolyte successfully scanned" });
+    try {
 
-     // Send message to clients to refresh Mortimer's list. 
-     io.emit("refreshMortimerList", {});
+      console.log("Data received in 'acolyteScanned': ", data);
 
-    });
+      if (!data?.email) throw new Error("Data has no email attribute");
 
+      let acolyteEmail = data?.email;
+
+      console.log("Acolyte scanned. Email: ", acolyteEmail);
+
+      // Await the asynchronous operation to ensure it completes
+      const newPlayerData = await toggleIsInsideByEmail(acolyteEmail);
+  
+      // let acolyteData = findPlayerByEmail(acolyteEmail);
+
+      console.log("SOCKETID: ", newPlayerData.socketId);
+
+      // Send confirmation message to the client who scanned the acolyte
+      io.to(newPlayerData.socketId).emit("acolyteScannedResponse", { success: true, playerData: newPlayerData }); // Acolyte
+      io.to(socket.id).emit("acolyteScannedResponse", { success: true }); // Istvan
+   
+      // Notify clients to refresh Mortimer's list
+      io.emit("refreshMortimerList", {});
+  
+    } catch (error) {
+
+      console.log('Error in method acolyteScanned. Error: ', error);
+  
+      // Send error message to the client
+      io.to(data.socket).emit("acolyteScannedResponse", { success: false, erorMessage: error });
+      io.to(socket.id).emit("acolyteScannedResponse", { success: false, erorMessage: error });
+    }
+  
+  });
+  
 });
 
 //Use bodyparser (but express should be enough)

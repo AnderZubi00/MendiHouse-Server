@@ -35,7 +35,7 @@ const authenticate = async (req, res) => {
     console.log(decodedToken);
 
   } catch (error) {
-    console.error('Error de autenticación:', error.message);
+    console.log('Error de autenticación:', error.message);
     res.status(401).json({ message: 'Autenticación fallida', error: error.message });
   }
 };
