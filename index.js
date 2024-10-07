@@ -76,7 +76,7 @@ io.on("connection", (socket) => {
 
       // Send confirmation message to the client who scanned the acolyte
       io.to(newPlayerData.socketId).emit("acolyteScannedResponse", { success: true, playerData: newPlayerData }); /// Acolyte
-      io.to(socket.id).emit("acolyteScannedResponse", { success: true }); // Istvan
+      io.to(socket.id).emit("acolyteScannedResponse", { success: true, playerData: newPlayerData }); // Istvan
    
       // Notify clients to refresh Mortimer's list
       const acolyteList = await getAllAcolytes();
