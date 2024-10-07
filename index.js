@@ -6,7 +6,7 @@ const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 
 //Import function for update in MongoDB
-const { updatePlayerByEmail, findPlayerByEmail, toggleIsInsideByEmail } = require('./src/database/Player');
+const { updatePlayerByEmail, getAllAcolytes, toggleIsInsideByEmail } = require('./src/database/Player');
 
 //Import model
 const Player = require('./src/models/playerModel');
@@ -79,7 +79,8 @@ io.on("connection", (socket) => {
       io.to(socket.id).emit("acolyteScannedResponse", { success: true }); // Istvan
    
       // Notify clients to refresh Mortimer's list
-      io.emit("refreshMortimerList", {});
+      const acolyteList = await getAllAcolytes();
+      io.emit("refreshMortimerList", acolyteList);
   
     } catch (error) {
 

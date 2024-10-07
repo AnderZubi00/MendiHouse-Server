@@ -5,7 +5,7 @@ const getAllPlayers = async () => {
     try {
         console.log("Fetching all players from the database");
         const players = await Player.getAllPlayers();
-        console.log("Players fetched:", players); 
+        // console.log("Players fetched:", players); 
         return players;
     } catch (error) {
         console.log("Error fetching players:", error);
@@ -18,7 +18,7 @@ const getAllAcolytes = async () => {
     try {
         console.log("Fetching all players with the role ACOLYTE from the database");
         const players = await Player.getAllAcolytes();
-        console.log("Players fetched:", players); 
+        // console.log("Players fetched:", players); 
         return players;
     } catch (error) {
         console.log("Error fetching players:", error);
