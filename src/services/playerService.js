@@ -1,4 +1,4 @@
-const Player = require('../database/Player'); 
+const Player = require('../database/Player');
 
 // Service to get all players from the database
 const getAllPlayers = async () => {
@@ -29,14 +29,14 @@ const getAllAcolytes = async () => {
 const getRole = (playerData) => {
 
     let role;
-    if      (playerData.email === "classcraft.daw2@aeg.eus") role = "ISTVAN";
-    else if (playerData.email === "ozarate@aeg.eus")         role = "VILLAIN";
-    else if (playerData.email === "oskar.calvo@aeg.eus")     role = "MORTIMER";
-    else                                                     role = "ACOLYTE";
-    
+    if (playerData.email === process.env.ISTVAN_EMAIL) role = "ISTVAN";
+    else if (playerData.email === process.env.VILLAIN_EMAIL) role = "VILLAIN";
+    else if (playerData.email === process.env.MORTIMER_EMAIL) role = "MORTIMER";
+    else role = "ACOLYTE";
+
     console.log("Entered method getRole()");
     console.log(`Returned ${role} role`);
-    
+
     return role;
 }
 
@@ -62,7 +62,7 @@ const createPlayer = async (playerData) => {
 const updatePlayerByEmail = async (email, playerData) => {
     try {
         console.log(`Updating player with email: ${email}`);
-        const updatedPlayer = await Player.updatePlayerByEmail(email, playerData); 
+        const updatedPlayer = await Player.updatePlayerByEmail(email, playerData);
         return updatedPlayer;
     } catch (error) {
         console.log("Error updating player:", error);
@@ -72,7 +72,7 @@ const updatePlayerByEmail = async (email, playerData) => {
 
 const findPlayerByEmail = async (email) => {
     try {
-        const player = await Player.findPlayerByEmail(email); 
+        const player = await Player.findPlayerByEmail(email);
         return player;
     } catch (error) {
         console.log("Error finding player:", error);
