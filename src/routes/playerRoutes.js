@@ -7,7 +7,8 @@ const playerController = require("../controller/playerController");
 router.get("/", playerController.getAllPlayers);
 router.post("/", playerController.updateOrCreate);
 router.patch("/", playerController.updateOrCreate);
-// Route to get all the players with the role ACOLYTE
-router.get("/acolytes", playerController.getAllAcolytes);
+router.get("/acolytes", playerController.getAllAcolytes); // Route to get all the players with the role ACOLYTE
+router.post("/toggleLaboratoryEntrance", playerController.toggleLaboratoryEntrance);
+
 
 module.exports = router;

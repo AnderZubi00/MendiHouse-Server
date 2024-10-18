@@ -43,21 +43,26 @@ io.on("connection", (socket) => {
   
   // Add to listen to the function to update the socket Id of the client
   socket.on("updateSocketId", (emailSocketId) => {
-    console.log("\nUpdate the socket id with the following data:");
-    console.log("     email --> "+ emailSocketId.email);
-    console.log("     socketId --> "+ emailSocketId.socketId);
-
-    // Convert string to object
-    const socketIdObject = {socketId: emailSocketId.socketId};
-
-    // Update the socketId
-    updatePlayerByEmail(emailSocketId.email, socketIdObject);
     
+      console.log("\n========= UPDATE SOCKET ID =========");
+      
+      console.log("Update the socket id with the following data:");
+      console.log("     email --> "+ emailSocketId.email);
+      console.log("     socketId --> "+ emailSocketId.socketId);
+      
+      // Convert string to object
+      const socketIdObject = {socketId: emailSocketId.socketId};
+      
+      // Update the socketId
+      updatePlayerByEmail(emailSocketId.email, socketIdObject);
+      
   });
 
   socket.on("acolyteScanned", async (data) => {
 
     try {
+
+      console.log("\n========= ACOLYTE SCANNED =========");
 
       console.log("Data received in 'acolyteScanned': ", data);
 

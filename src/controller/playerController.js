@@ -1,6 +1,9 @@
 const playerService = require("../services/playerService");
+const { toggleIsInsideByEmail } = require("../database/Player");
 
 const getAllPlayers = async (req, res) => {
+
+    console.log("========= GET ALL PLAYERS =========");
 
     try {
         const allPlayers = await playerService.getAllPlayers();
@@ -20,6 +23,8 @@ const getAllPlayers = async (req, res) => {
 
 // Controler for the route to get all the players with the role ACOLYTE
 const getAllAcolytes = async (req, res) => {
+
+    console.log("========= GET ALL ACOLYTES =========");
 
     try {
         const allAcolytes = await playerService.getAllAcolytes();
@@ -82,8 +87,52 @@ const updateOrCreate = async (req, res) => {
     }
 };
 
+
+const toggleLaboratoryEntrance = async (req, res) => {
+
+    console.log("========= TOGGLE LABORATORY ENTRANCE =========");
+    
+    try {
+        const playerData = req.body; // Get player data from the request body
+        const {email} = playerData;
+
+        // Validating all required fields
+        if (!email) {
+            console.log("Error updating inInside: Email field not provided");
+            return res
+            .status(400)
+            .send({
+                status: "FAILED",
+                data: {
+                    error: "Email field is missing or empty in the request data"
+                },
+            });
+        }
+        
+        // Await the asynchronous operation to ensure it completes
+        const newPlayerData = await toggleIsInsideByEmail(email);
+        
+        if (newPlayerData)
+        {
+            console.log("In inside toggled correctly.");
+            return res.send({ status: "Ok", data: newPlayerData });
+        } else { 
+            console.log("Error toggling inside.");
+            return res.send({ status: "Ok", data: newPlayerData });
+        }
+    } catch (error) {
+        res.status(error?.status || 500).send({
+            status: "FAILED",
+            message: "Error at executing the petition:",
+            data: { error: error?.message || error }
+        });
+    }
+
+}
+
 module.exports = {
     getAllPlayers,
     getAllAcolytes,
-    updateOrCreate
+    updateOrCreate,
+    toggleLaboratoryEntrance
 };
