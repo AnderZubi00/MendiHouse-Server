@@ -104,24 +104,54 @@ const toggleIsInsideLabByEmail = async (emailFilter) => {
       throw error;
     }
 };
+
+
+const toggleIsInsideTowerByEmail = async (emailFilter) => {
+    
+    try {
+
+      const updatedPlayer = await Player.findOneAndUpdate(
+        { email: emailFilter }, // Filter to find the player by email
+        [
+          {
+            $set: {
+              isInsideTower: { $not: '$isInsideTower' } // Toggle the value of isInsideTower
+            }
+          }
+        ],
+        { new: true } // Return the updated document
+      );
+  
+      // Handle the case where the player is not found
+      if (!updatedPlayer) {
+        throw new Error(`Player with email ${emailFilter} not found.`);
+      }
+  
+      console.log(`Player with email ${emailFilter} has toggled isInsideTower successfully`);
+  
+      return updatedPlayer;
+  
+    } catch (error) {
+      console.log(`Error toggling isInsideTower for player with email ${emailFilter}:`, error);
+      throw error;
+    }
+};
+
   
 
 const findPlayerByEmail = async (email) => {
-
     try {
-        
         console.log("Getting data player by email: ", email);
         let player = await Player.find({email: email});
 
         // If there is no player with that email we return null
         if (player.length==0) return null
-        return player;
 
+        return player[0];
     } catch (error) {
         console.log(`Error getting the player by email (${email}):`, error);
         throw error;
     }
-
 };
 
 
@@ -131,5 +161,6 @@ module.exports = {
     createPlayer,
     updatePlayerByEmail,
     findPlayerByEmail,
-    toggleIsInsideLabByEmail
+    toggleIsInsideLabByEmail,
+    toggleIsInsideTowerByEmail
 }

@@ -3,7 +3,7 @@ const { toggleIsInsideLabByEmail } = require("../database/Player");
 
 const getAllPlayers = async (req, res) => {
 
-    console.log("========= GET ALL PLAYERS =========");
+    console.log("\n========= GET ALL PLAYERS =========");
 
     try {
         const allPlayers = await playerService.getAllPlayers();
@@ -24,7 +24,7 @@ const getAllPlayers = async (req, res) => {
 // Controler for the route to get all the players with the role ACOLYTE
 const getAllAcolytes = async (req, res) => {
 
-    console.log("========= GET ALL ACOLYTES =========");
+    console.log("\n========= GET ALL ACOLYTES =========");
 
     try {
         const allAcolytes = await playerService.getAllAcolytes();
@@ -44,7 +44,7 @@ const getAllAcolytes = async (req, res) => {
 
 const updateOrCreate = async (req, res) => {
 
-    console.log("========= UPDATE OR CREATE PLAYER =========");
+    console.log("\n========= UPDATE OR CREATE PLAYER =========");
     console.log('Inserting or updating Player document in MongoDB');
     
     try {
@@ -90,7 +90,7 @@ const updateOrCreate = async (req, res) => {
 
 const toggleLaboratoryEntrance = async (req, res) => {
 
-    console.log("========= TOGGLE LABORATORY ENTRANCE =========");
+    console.log("\n========= TOGGLE LABORATORY ENTRANCE =========");
     
     try {
         const playerData = req.body; // Get player data from the request body

@@ -1,20 +1,15 @@
 const express = require('express');
 const { createServer } = require("http");
 const { Server } = require("socket.io");
-
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 
-//Import function for update in MongoDB
-const { updatePlayerByEmail, getAllAcolytes, toggleIsInsideLabByEmail } = require('./src/database/Player');
+const { updatePlayerByEmail, getAllAcolytes, toggleIsInsideLabByEmail, toggleIsInsideTowerByEmail, findPlayerByEmail } = require('./src/database/Player');
 
-//Import model
-const Player = require('./src/models/playerModel');
 
-//Import routes
-const authRoutes = require('./src/routes/authRoutes');
-
-const playerRouter = require("./src/routes/playerRoutes");
+// ------------------------------------- //
+// -----   GENERAL CONFIGURATION   ----- //
+// ------------------------------------- //
 
 //Connfigurate enviroment variables
 dotenv.config();
@@ -33,6 +28,29 @@ const io = new Server(httpServer, {
   }
 });
 
+
+// ------------------------ //
+// -----   REST API   ----- //
+// ------------------------ //
+
+//Import routes
+const authRoutes = require('./src/routes/authRoutes');
+const playerRouter = require("./src/routes/playerRoutes");
+
+// Middleware to parse JSON
+app.use(express.json());
+
+// Route API
+app.use('/api/token', authRoutes);
+app.use("/api/players", playerRouter);
+
+// Start the server
+const PORT = process.env.PORT || 3000;
+
+
+// ------------------------ //
+// -----   SOCKETS   ------ //
+// ------------------------ //
 
 // Create a conection with a client device 
 io.on("connection", (socket) => {
@@ -75,8 +93,6 @@ io.on("connection", (socket) => {
       // Await the asynchronous operation to ensure it completes
       const newPlayerData = await toggleIsInsideLabByEmail(acolyteEmail);
   
-      // let acolyteData = findPlayerByEmail(acolyteEmail);
-
       console.log("SOCKETID: ", newPlayerData.socketId);
 
       // Send confirmation message to the client who scanned the acolyte
@@ -95,24 +111,50 @@ io.on("connection", (socket) => {
       io.to(data.socket).emit("acolyteScannedResponse", { success: false, erorMessage: error });
       io.to(socket.id).emit("acolyteScannedResponse", { success: false, erorMessage: error });
     }
-  
+
   });
-  
+
 });
 
-//Use bodyparser (but express should be enough)
-//app.use(bodyParser.json());
+// --------------------- //
+// -----   MQTT   ------ //
+// --------------------- //
 
-// Middleware to parse JSON
-app.use(express.json());
+// Implement the subscriptions and publications here...
+
+async function toggleAcolyteInsideTower(email) {
+
+  try {
+    console.log("\n========= TOOGLE ACOLYTE INSIDE TOWER =========");
+
+    if (!email) throw new Error("Email parameter is null or undefined");
+
+    let playerCurrentScreen = await getPlayerScreen(email);
+
+    if (playerCurrentScreen !== "TowerDoorScreen" && playerCurrentScreen !== "Tower Screen") {
+      console.log("The player is not in the screen 'TowerDoorScreen', so he can not enter the tower.");
+      return;
+    }
+    
+    // Await the asynchronous operation to ensure it completes
+    const newPlayerData = await toggleIsInsideTowerByEmail(email);
+    
+    console.log("SocketId: ", newPlayerData.socketId);
+
+    // Send confirmation message to the client who scanned the acolyte
+    io.to(newPlayerData.socketId).emit("toggleInsideTower", { success: true, playerData: newPlayerData }); 
+
+    console.log('Acolyte has entered or exited the tower successfully');
+
+  } catch (error) {
+    console.log('Error entering the acolyte to tower. Error: ', error);
+  }
+}
 
 
-// Route API
-app.use('/api/token', authRoutes);
-app.use("/api/players", playerRouter);
-
-// Start the server
-const PORT = process.env.PORT || 3000;
+// --------------------------- //
+// -----   RUN SERVER   ------ //
+// --------------------------- //
 
 async function start() {
 
@@ -135,5 +177,57 @@ async function start() {
 
 start();
 
+
+// ---------------------------------- //
+// -----   UTILITY FUNCTIONS   ------ //
+// ---------------------------------- //
+
+
+async function getPlayerScreen(email) {
+
+  console.log("\n========= GET PLAYER CURRENT SCREEN =========");
+
+  try {
+    const playerData = await findPlayerByEmail(email);
+    if (!playerData) {
+      throw new Error("Player not found");
+    }
+    const { socketId } = playerData;
+
+    // Return a promise to be able to use await() when calling to this method.
+    return new Promise((resolve, reject) => {
+      io.timeout(3000).to(socketId).emit("playerScreen", {}, (err, response) => {
+
+        if (err) {
+          console.error("Error receiving response from client:", err);
+          return reject(err);
+        }
+
+        console.log("Respuesta recibida del cliente:", response[0]);
+
+        // Get and return the screen name the player.
+        if (response[0]?.success) {
+          let { data } = response[0];
+          if (data) {
+            let { route } = data;
+            if (route) {
+              return resolve(route);  // Resolve the promise
+            }
+          }
+        } else {
+          console.log("El cliente respondió con un error:", response.errorMessage);
+        }
+
+        // If the response do not have a valid screen name, resolve with undefined.
+        return resolve(undefined);
+
+      });
+    });
+
+  } catch (error) {
+    console.log('Error en getPlayerScreen:', error);
+    throw error; 
+  }
+}
 
 
