@@ -20,6 +20,7 @@
     "express": "^4.21.0",
     "firebase-admin": "^12.5.0",
     "mongoose": "^8.6.3",
+    "mqtt": "^5.10.1",
     "socket.io": "^4.8.0",
     "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.4.0"
   }

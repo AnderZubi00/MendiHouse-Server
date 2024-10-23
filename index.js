@@ -4,6 +4,8 @@ const { Server } = require("socket.io");
 
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
+const mqtt = require('mqtt'); // Import the MQTT package
+const fs = require('fs');
 
 //Import function for update in MongoDB
 const { updatePlayerByEmail, getAllAcolytes, toggleIsInsideLabByEmail } = require('./src/database/Player');
@@ -33,6 +35,30 @@ const io = new Server(httpServer, {
   }
 });
 
+///////////// Connect to the MQTT broker mosquitto ///////////////
+
+//Load the certificates
+const mqttOptions = {
+  key: fs.readFileSync('./certificates/server.key'),
+  cert: fs.readFileSync('./certificates/server.crt'),
+  ca: fs.readFileSync('./certificates/ca.crt'),
+  rejectUnauthorized: true
+}; 
+
+const mqttClient = mqtt.connect(process.env.MQTT_BROKER_URL, mqttOptions);
+
+// MQTT connection event
+mqttClient.on('connect', () => {
+  console.log('Connected securely to MQTT broker');
+});
+
+// Handle incoming MQTT messages as part of a subscription to an MQTT topic.
+mqttClient.on('message', (topic, message) => {
+  console.log(`Received MQTT message on topic ${topic}: ${message.toString()}`);
+  // Here you can handle incoming messages as needed
+});
+
+/////////////////////////////////////////////////////////////
 
 // Create a conection with a client device 
 io.on("connection", (socket) => {
