@@ -1,5 +1,5 @@
 const playerService = require("../services/playerService");
-const { toggleIsInsideByEmail } = require("../database/Player");
+const { toggleIsInsideLabByEmail } = require("../database/Player");
 
 const getAllPlayers = async (req, res) => {
 
@@ -110,7 +110,7 @@ const toggleLaboratoryEntrance = async (req, res) => {
         }
         
         // Await the asynchronous operation to ensure it completes
-        const newPlayerData = await toggleIsInsideByEmail(email);
+        const newPlayerData = await toggleIsInsideLabByEmail(email);
         
         if (newPlayerData)
         {

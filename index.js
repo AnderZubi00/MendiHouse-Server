@@ -6,7 +6,7 @@ const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 
 //Import function for update in MongoDB
-const { updatePlayerByEmail, getAllAcolytes, toggleIsInsideByEmail } = require('./src/database/Player');
+const { updatePlayerByEmail, getAllAcolytes, toggleIsInsideLabByEmail } = require('./src/database/Player');
 
 //Import model
 const Player = require('./src/models/playerModel');
@@ -73,7 +73,7 @@ io.on("connection", (socket) => {
       console.log("Acolyte scanned. Email: ", acolyteEmail);
 
       // Await the asynchronous operation to ensure it completes
-      const newPlayerData = await toggleIsInsideByEmail(acolyteEmail);
+      const newPlayerData = await toggleIsInsideLabByEmail(acolyteEmail);
   
       // let acolyteData = findPlayerByEmail(acolyteEmail);
 

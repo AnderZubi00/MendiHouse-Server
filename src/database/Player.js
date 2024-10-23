@@ -64,7 +64,7 @@ const updatePlayerByEmail = async (emailFilter, newPlayerData) => {
             throw new Error(`Player with email ${emailFilter} not found.`);
         }
 
-        console.log(`Player with email ${emailFilter} has been updated successfuly to ${updatedPlayer.isInside}`);
+        console.log(`Player with email ${emailFilter} has been updated successfuly to ${updatedPlayer.isInsideLab}`);
 
         return updatedPlayer;
 
@@ -74,7 +74,7 @@ const updatePlayerByEmail = async (emailFilter, newPlayerData) => {
     }
 };
 
-const toggleIsInsideByEmail = async (emailFilter) => {
+const toggleIsInsideLabByEmail = async (emailFilter) => {
     
     try {
 
@@ -83,7 +83,7 @@ const toggleIsInsideByEmail = async (emailFilter) => {
         [
           {
             $set: {
-              isInside: { $not: '$isInside' } // Toggle the value of isInside
+              isInsideLab: { $not: '$isInsideLab' } // Toggle the value of isInsideLab
             }
           }
         ],
@@ -95,12 +95,12 @@ const toggleIsInsideByEmail = async (emailFilter) => {
         throw new Error(`Player with email ${emailFilter} not found.`);
       }
   
-      console.log(`Player with email ${emailFilter} has toggled isInside to ${updatedPlayer.isInside}`);
+      console.log(`Player with email ${emailFilter} has toggled isInsideLab to ${updatedPlayer.isInsideLab}`);
   
       return updatedPlayer;
   
     } catch (error) {
-      console.log(`Error toggling isInside for player with email ${emailFilter}:`, error);
+      console.log(`Error toggling isInsideLab for player with email ${emailFilter}:`, error);
       throw error;
     }
 };
@@ -131,5 +131,5 @@ module.exports = {
     createPlayer,
     updatePlayerByEmail,
     findPlayerByEmail,
-    toggleIsInsideByEmail
+    toggleIsInsideLabByEmail
 }

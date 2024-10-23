@@ -23,7 +23,7 @@ const playerSchema = new Schema({
     gold: Number,
     created_date: Date,
     socketId: String,
-    isInside: Boolean,
+    isInsideLab: Boolean,
     role: String
 });
 

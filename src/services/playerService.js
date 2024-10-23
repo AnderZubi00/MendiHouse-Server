@@ -48,7 +48,7 @@ const createPlayer = async (playerData) => {
 
         playerData.role = getRole(playerData);
         playerData.socketId = null;
-        playerData.isInside = false;
+        playerData.isInsideLab = false;
 
         const newPlayer = await Player.createPlayer(playerData);
         return newPlayer;
