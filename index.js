@@ -187,7 +187,7 @@ async function toggleAcolyteInsideTower(email) {
     let playerCurrentScreen = await getPlayerScreen(email);
 
     if (playerCurrentScreen !== "TowerDoorScreen" && playerCurrentScreen !== "Tower Screen") {
-      console.log("The player is not in the screen 'TowerDoorScreen', so he can not enter the tower.");
+      console.log("The player is not in the screen 'TowerDoorScreen' or inside the Tower, so he can not enter or exit the tower.");
       return;
     }
     
