@@ -3,6 +3,8 @@ const { createServer } = require("http");
 const { Server } = require("socket.io");
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
+const mqtt = require('mqtt'); // Import the MQTT package
+const fs = require('fs');
 
 const { updatePlayerByEmail, getAllAcolytes, toggleIsInsideLabByEmail, toggleIsInsideTowerByEmail, findPlayerByEmail } = require('./src/database/Player');
 
@@ -28,6 +30,17 @@ const io = new Server(httpServer, {
   }
 });
 
+// ---- MQTT CONFIGURATION ---- //
+
+//Load the certificates
+const mqttOptions = {
+  key: fs.readFileSync('./certificates/server.key'),
+  cert: fs.readFileSync('./certificates/server.crt'),
+  ca: fs.readFileSync('./certificates/ca.crt'),
+  rejectUnauthorized: true
+}; 
+
+const mqttClient = mqtt.connect(process.env.MQTT_BROKER_URL, mqttOptions);
 
 // ------------------------ //
 // -----   REST API   ----- //
@@ -120,36 +133,17 @@ io.on("connection", (socket) => {
 // -----   MQTT   ------ //
 // --------------------- //
 
-// Implement the subscriptions and publications here...
+// MQTT connection event
+mqttClient.on('connect', () => {
+  console.log('Connected securely to MQTT broker');
+});
 
-async function toggleAcolyteInsideTower(email) {
 
-  try {
-    console.log("\n========= TOOGLE ACOLYTE INSIDE TOWER =========");
-
-    if (!email) throw new Error("Email parameter is null or undefined");
-
-    let playerCurrentScreen = await getPlayerScreen(email);
-
-    if (playerCurrentScreen !== "TowerDoorScreen" && playerCurrentScreen !== "Tower Screen") {
-      console.log("The player is not in the screen 'TowerDoorScreen', so he can not enter the tower.");
-      return;
-    }
-    
-    // Await the asynchronous operation to ensure it completes
-    const newPlayerData = await toggleIsInsideTowerByEmail(email);
-    
-    console.log("SocketId: ", newPlayerData.socketId);
-
-    // Send confirmation message to the client who scanned the acolyte
-    io.to(newPlayerData.socketId).emit("toggleInsideTower", { success: true, playerData: newPlayerData }); 
-
-    console.log('Acolyte has entered or exited the tower successfully');
-
-  } catch (error) {
-    console.log('Error entering the acolyte to tower. Error: ', error);
-  }
-}
+// Handle incoming MQTT messages as part of a subscription to an MQTT topic.
+mqttClient.on('message', (topic, message) => {
+  console.log(`Received MQTT message on topic ${topic}: ${message.toString()}`);
+  // Here you can handle incoming messages as needed
+});// Implement the subscriptions and publications here...
 
 
 // --------------------------- //
@@ -181,6 +175,36 @@ start();
 // ---------------------------------- //
 // -----   UTILITY FUNCTIONS   ------ //
 // ---------------------------------- //
+
+
+async function toggleAcolyteInsideTower(email) {
+
+  try {
+    console.log("\n========= TOOGLE ACOLYTE INSIDE TOWER =========");
+
+    if (!email) throw new Error("Email parameter is null or undefined");
+
+    let playerCurrentScreen = await getPlayerScreen(email);
+
+    if (playerCurrentScreen !== "TowerDoorScreen" && playerCurrentScreen !== "Tower Screen") {
+      console.log("The player is not in the screen 'TowerDoorScreen', so he can not enter the tower.");
+      return;
+    }
+    
+    // Await the asynchronous operation to ensure it completes
+    const newPlayerData = await toggleIsInsideTowerByEmail(email);
+    
+    console.log("SocketId: ", newPlayerData.socketId);
+
+    // Send confirmation message to the client who scanned the acolyte
+    io.to(newPlayerData.socketId).emit("toggleInsideTower", { success: true, playerData: newPlayerData }); 
+
+    console.log('Acolyte has entered or exited the tower successfully');
+
+  } catch (error) {
+    console.log('Error entering the acolyte to tower. Error: ', error);
+  }
+}
 
 
 async function getPlayerScreen(email) {
