@@ -34,10 +34,11 @@ const io = new Server(httpServer, {
 
 //Load the certificates
 const mqttOptions = {
-  key: fs.readFileSync('./certificates/server.key'),
-  cert: fs.readFileSync('./certificates/server.crt'),
-  ca: fs.readFileSync('./certificates/ca.crt'),
-  rejectUnauthorized: true
+  clientId: 'MendiHouse-Node.js',
+  // key: fs.readFileSync('./certificates/server.key'),
+  // cert: fs.readFileSync('./certificates/server.crt'),
+  // ca: fs.readFileSync('./certificates/ca.crt'),
+  // rejectUnauthorized: true
 }; 
 
 const mqttClient = mqtt.connect(process.env.MQTT_BROKER_URL, mqttOptions);
