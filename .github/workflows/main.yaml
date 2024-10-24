@@ -21,7 +21,7 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      - name: Restart PM2
-        run: npm restart
+      - name: Start PM2
+        run: npm start
 
       
