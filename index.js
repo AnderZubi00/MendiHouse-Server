@@ -35,10 +35,10 @@ const io = new Server(httpServer, {
 //Load the certificates
 const mqttOptions = {
   clientId: 'MendiHouse-Node.js',
-  // key: fs.readFileSync('./certificates/server.key'),
-  // cert: fs.readFileSync('./certificates/server.crt'),
-  // ca: fs.readFileSync('./certificates/ca.crt'),
-  // rejectUnauthorized: true
+  key: fs.readFileSync('./certificates/server.key'),
+  cert: fs.readFileSync('./certificates/server.crt'),
+  ca: fs.readFileSync('./certificates/ca.crt'),
+  rejectUnauthorized: true
 }; 
 
 const mqttClient = mqtt.connect(process.env.MQTT_BROKER_URL, mqttOptions);
@@ -137,6 +137,17 @@ io.on("connection", (socket) => {
 // MQTT connection event
 mqttClient.on('connect', () => {
   console.log('Connected securely to MQTT broker');
+
+  // Subscribe to the desired topic(s)
+  const topic = 'trial'; // your MQTT topic
+  mqttClient.subscribe(topic, (err) => {
+    if (err) {
+      console.error('Failed to subscribe to topic:', topic, err);
+    } else {
+      console.log(`Successfully subscribed to topic: ${topic}`);
+    }
+  });
+
 });
 
 
