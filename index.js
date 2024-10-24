@@ -5,6 +5,7 @@ const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const mqtt = require('mqtt'); // Import the MQTT package
 const fs = require('fs');
+const admin = require('firebase-admin')
 
 const { updatePlayerByEmail, getAllAcolytes, toggleIsInsideLabByEmail, toggleIsInsideTowerByEmail, findPlayerByEmail } = require('./src/database/Player');
 
@@ -49,6 +50,7 @@ const mqttClient = mqtt.connect(process.env.MQTT_BROKER_URL, mqttOptions);
 //Import routes
 const authRoutes = require('./src/routes/authRoutes');
 const playerRouter = require("./src/routes/playerRoutes");
+const { messageSomeoneIsTryingToEnter } = require('./src/messages/messagesTheTower');
 
 // Middleware to parse JSON
 app.use(express.json());
@@ -111,7 +113,7 @@ io.on("connection", (socket) => {
       // Send confirmation message to the client who scanned the acolyte
       io.to(newPlayerData.socketId).emit("acolyteScannedResponse", { success: true, playerData: newPlayerData }); /// Acolyte
       io.to(socket.id).emit("acolyteScannedResponse", { success: true, playerData: newPlayerData }); // Istvan
-   
+  
       // Notify clients to refresh Mortimer's list
       const acolyteList = await getAllAcolytes();
       io.emit("refreshMortimerList", acolyteList);
@@ -186,8 +188,11 @@ async function toggleAcolyteInsideTower(email) {
 
     let playerCurrentScreen = await getPlayerScreen(email);
 
+    // Send message to mortimer that an acolyte is trying to access
+    sendPushNotification(messageSomeoneIsTryingToEnter);
     if (playerCurrentScreen !== "TowerDoorScreen" && playerCurrentScreen !== "Tower Screen") {
       console.log("The player is not in the screen 'TowerDoorScreen' or inside the Tower, so he can not enter or exit the tower.");
+      // Send message to mortimer that an acolyte is trying to acces
       return;
     }
     
@@ -234,7 +239,7 @@ async function getPlayerScreen(email) {
           let { data } = response[0];
           if (data) {
             let { route } = data;
-            if (route) {
+            if (route) {            
               return resolve(route);  // Resolve the promise
             }
           }
@@ -255,3 +260,15 @@ async function getPlayerScreen(email) {
 }
 
 
+function sendPushNotification(message) {
+
+  admin
+      .messaging()
+      .sendEachForMulticast(message)
+      .then(response => {
+        console.log('Successfully sent message:', response);
+      })
+      .catch(error => {
+        console.log('Error sending message:', error);
+      });
+}
