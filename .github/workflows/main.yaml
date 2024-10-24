@@ -1,4 +1,4 @@
-name: NodeJS Fastify API
+name: PM2 Server CI
 run-name: Deploy to Ubuntu Server 
 on:
   push:
@@ -6,23 +6,21 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [20.17.0]
-
+    runs-on: self-hosted
+    
     steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.IP }}
-          username: ${{ secrets.USERNAME }}
-          password: ${{ secrets.PASSWORD }}
-          script: |
-            cd ${{ secrets.APP_PATH }}
-            sudo git pull origin
-            npm install
-            npm run migrate:up
-            pm2 restart ${{ secrets.APP_ID }}
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with: 
+          node-version: '20'
+
+      - name: Install Dependencies
+        uses: npm install
+
+      - name: Restart PM2
+        uses: npm restart
+
+      
