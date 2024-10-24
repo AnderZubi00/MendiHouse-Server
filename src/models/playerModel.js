@@ -24,6 +24,8 @@ const playerSchema = new Schema({
     created_date: Date,
     socketId: String,
     isInsideLab: Boolean,
+    isInsideTower: Boolean,
+    fcm_token: String,
     role: String
 });
 
