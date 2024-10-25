@@ -1,4 +1,4 @@
-name: PM2 Server CI Test 2
+name: PM2 Server CI
 run-name: Deploy to Ubuntu Server 
 on:
   push:
@@ -18,7 +18,11 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Start PM2
+      - name: Kill :3000 services
+        run: |
+          lsof -i :3000
+
+      - name: Start / Restart PM2
         run: npm start
 
       
