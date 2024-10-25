@@ -5,6 +5,7 @@ module.exports = {
         script: "./index.js",
         exec_mode: "cluster_mode",
   
+        
         // Logging
         out_file: "./pm2/out.log",
         error_file: "./pm2/error.log",
