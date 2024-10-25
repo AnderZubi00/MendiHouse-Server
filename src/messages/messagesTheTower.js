@@ -12,7 +12,35 @@ const messageSomeoneIsTryingToEnter = {
     },
 };
 
+const messageSomeoneSuccesfullyOpen = {
+
+    tokens: [],
+    notification: {
+        body: 'An acolyte tried to open the door fo the tower and success.',
+        title: 'The tower door is opening!!!',
+    },
+    android: {
+        notification: {
+        },
+    },
+};
+
+const messageSomeoneSFailedOpen= {
+
+    tokens: [],
+    notification: {
+        body: 'An acolyte tried to open the door fo the tower and failed.',
+        title: 'The tower door is still closed!!!',
+    },
+    android: {
+        notification: {
+        },
+    },
+};
+
 
 module.exports = {
-    messageSomeoneIsTryingToEnter
+    messageSomeoneIsTryingToEnter,
+    messageSomeoneSFailedOpen,
+    messageSomeoneSuccesfullyOpen,
 }
