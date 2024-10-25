@@ -2,7 +2,7 @@ name: PM2 Server CI Test 2
 run-name: Deploy to Ubuntu Server 
 on:
   push:
-    branches: [main]
+    branches: [master]
 
 jobs:
   deploy:
