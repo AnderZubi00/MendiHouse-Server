@@ -26,7 +26,7 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: "*",  
+    origin: "*",
     methods: ["GET", "POST"]
   }
 });
@@ -40,7 +40,7 @@ const mqttOptions = {
   // cert: fs.readFileSync('./certificates/server.crt'),
   // ca: fs.readFileSync('./certificates/ca.crt'),
   // rejectUnauthorized: true
-}; 
+};
 
 const mqttClient = mqtt.connect(process.env.MQTT_BROKER_URL, mqttOptions);
 
@@ -71,25 +71,25 @@ const PORT = process.env.PORT || 3000;
 // Create a conection with a client device 
 io.on("connection", (socket) => {
 
-  console.log("\nConnection is made with the following socket id ---> "+ socket.id);
+  console.log("\nConnection is made with the following socket id ---> " + socket.id);
   // Return the socket Id  to the client using a socket
   io.to(socket.id).emit("connection", { socketId: socket.id });
-  
+
   // Add to listen to the function to update the socket Id of the client
   socket.on("updateSocketId", (emailSocketId) => {
-    
-      console.log("\n========= UPDATE SOCKET ID =========");
-      
-      console.log("Update the socket id with the following data:");
-      console.log("     email --> "+ emailSocketId.email);
-      console.log("     socketId --> "+ emailSocketId.socketId);
-      
-      // Convert string to object
-      const socketIdObject = {socketId: emailSocketId.socketId};
-      
-      // Update the socketId
-      updatePlayerByEmail(emailSocketId.email, socketIdObject);
-      
+
+    console.log("\n========= UPDATE SOCKET ID =========");
+
+    console.log("Update the socket id with the following data:");
+    console.log("     email --> " + emailSocketId.email);
+    console.log("     socketId --> " + emailSocketId.socketId);
+
+    // Convert string to object
+    const socketIdObject = { socketId: emailSocketId.socketId };
+
+    // Update the socketId
+    updatePlayerByEmail(emailSocketId.email, socketIdObject);
+
   });
 
   socket.on("acolyteScanned", async (data) => {
@@ -108,21 +108,21 @@ io.on("connection", (socket) => {
 
       // Await the asynchronous operation to ensure it completes
       const newPlayerData = await toggleIsInsideLabByEmail(acolyteEmail);
-  
+
       console.log("SOCKETID: ", newPlayerData.socketId);
 
       // Send confirmation message to the client who scanned the acolyte
       io.to(newPlayerData.socketId).emit("acolyteScannedResponse", { success: true, playerData: newPlayerData }); /// Acolyte
       io.to(socket.id).emit("acolyteScannedResponse", { success: true, playerData: newPlayerData }); // Istvan
-  
+
       // Notify clients to refresh Mortimer's list
       const acolyteList = await getAllAcolytes();
       io.emit("refreshMortimerList", acolyteList);
-  
+
     } catch (error) {
 
       console.log('Error in method acolyteScanned. Error: ', error);
-  
+
       // Send error message to the client
       io.to(data.socket).emit("acolyteScannedResponse", { success: false, erorMessage: error });
       io.to(socket.id).emit("acolyteScannedResponse", { success: false, erorMessage: error });
@@ -165,10 +165,10 @@ async function start() {
     // Connect to mongoose
     await mongoose.connect(mongodbRoute, {});
     console.log('Conexion con Mongo correcta');
-    
+
   } catch (error) {
     console.log(`<<ERROR>> connecting to the database: ${error.message}`);
-    
+
   }
 }
 
@@ -189,21 +189,37 @@ async function toggleAcolyteInsideTower(email) {
 
     let playerCurrentScreen = await getPlayerScreen(email);
 
+    // Obtain the player data of Mortimer
+    const mortimerData = await findPlayerByEmail("aitor.mendiburu@ikasle.aeg.eus");
+    console.log("Mortimer Data: ");
+    console.log(mortimerData);
+
+
+    // Obtain the fcm_token from the player data to send the push notification
+    const fcm_token = mortimerData.fcm_token;
+
+    // Clone the message object to modify and sebd it
+    const messageWarningSomeoneIsTryingToEnterTheTower = structuredClone(messageSomeoneIsTryingToEnter);
+    // Add the fcm_token to the message tokens to send the message to the correct device/user
+    messageWarningSomeoneIsTryingToEnterTheTower.tokens.push(fcm_token);
+    console.log(messageWarningSomeoneIsTryingToEnterTheTower);
+    
     // Send message to mortimer that an acolyte is trying to access
-    sendPushNotification(messageSomeoneIsTryingToEnter);
+    sendPushNotification(messageWarningSomeoneIsTryingToEnterTheTower);
+
     if (playerCurrentScreen !== "TowerDoorScreen" && playerCurrentScreen !== "Tower Screen") {
       console.log("The player is not in the screen 'TowerDoorScreen' or inside the Tower, so he can not enter or exit the tower.");
-      // Send message to mortimer that an acolyte is trying to acces
+      
       return;
     }
-    
+
     // Await the asynchronous operation to ensure it completes
     const newPlayerData = await toggleIsInsideTowerByEmail(email);
-    
+
     console.log("SocketId: ", newPlayerData.socketId);
 
     // Send confirmation message to the client who scanned the acolyte
-    io.to(newPlayerData.socketId).emit("toggleInsideTower", { success: true, playerData: newPlayerData }); 
+    io.to(newPlayerData.socketId).emit("toggleInsideTower", { success: true, playerData: newPlayerData });
 
     console.log('Acolyte has entered or exited the tower successfully');
 
@@ -240,7 +256,7 @@ async function getPlayerScreen(email) {
           let { data } = response[0];
           if (data) {
             let { route } = data;
-            if (route) {            
+            if (route) {
               return resolve(route);  // Resolve the promise
             }
           }
@@ -256,20 +272,23 @@ async function getPlayerScreen(email) {
 
   } catch (error) {
     console.log('Error en getPlayerScreen:', error);
-    throw error; 
+    throw error;
   }
 }
 
+async function getDataFromTheEmail(email) {
+
+}
 
 function sendPushNotification(message) {
 
   admin
-      .messaging()
-      .sendEachForMulticast(message)
-      .then(response => {
-        console.log('Successfully sent message:', response);
-      })
-      .catch(error => {
-        console.log('Error sending message:', error);
-      });
+    .messaging()
+    .sendEachForMulticast(message)
+    .then(response => {
+      console.log('Successfully sent message:', response);
+    })
+    .catch(error => {
+      console.log('Error sending message:', error);
+    });
 }

@@ -1,5 +1,5 @@
 
-export const messageSomeoneIsTryingToEnter = {
+const messageSomeoneIsTryingToEnter = {
 
     tokens: [],
     notification: {
@@ -11,3 +11,8 @@ export const messageSomeoneIsTryingToEnter = {
         },
     },
 };
+
+
+module.exports = {
+    messageSomeoneIsTryingToEnter
+}
