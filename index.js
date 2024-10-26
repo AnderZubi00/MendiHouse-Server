@@ -135,7 +135,8 @@ io.on("connection", (socket) => {
 // -----   MQTT   ------ //
 // --------------------- //
 
-
+///Susbcrbe to topic 'idCard' and console.log message
+topicHandler.subscribe(mqttClient, 'idCard');
 
 
 // --------------------------- //
