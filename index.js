@@ -5,6 +5,7 @@ const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const mqtt = require('mqtt'); // Import the MQTT package
 const fs = require('fs');
+const topicHandler = require('./src/mqtt/topicHandler');
 
 const { updatePlayerByEmail, getAllAcolytes, toggleIsInsideLabByEmail, toggleIsInsideTowerByEmail, findPlayerByEmail } = require('./src/database/Player');
 
@@ -134,28 +135,7 @@ io.on("connection", (socket) => {
 // -----   MQTT   ------ //
 // --------------------- //
 
-// MQTT connection event
-mqttClient.on('connect', () => {
-  console.log('Connected securely to MQTT broker');
 
-  // Subscribe to the desired topic(s)
-  const topic = 'trial'; // your MQTT topic
-  mqttClient.subscribe(topic, (err) => {
-    if (err) {
-      console.error('Failed to subscribe to topic:', topic, err);
-    } else {
-      console.log(`Successfully subscribed to topic: ${topic}`);
-    }
-  });
-
-});
-
-
-// Handle incoming MQTT messages as part of a subscription to an MQTT topic.
-mqttClient.on('message', (topic, message) => {
-  console.log(`Received MQTT message on topic ${topic}: ${message.toString()}`);
-  // Here you can handle incoming messages as needed
-});// Implement the subscriptions and publications here...
 
 
 // --------------------------- //
