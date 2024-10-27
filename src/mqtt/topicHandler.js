@@ -1,29 +1,36 @@
-function subscribe(mqttClient, topic) {
+const { findPlayerByIdCard } = require('../database/Player');
+
+  function subscribe(mqttClient, topic) {
     mqttClient.subscribe(topic, (err) => {
       if (err) {
         console.error(`Failed to subscribe to topic ${topic}:`, err);
       } else {
-        console.log(`Successfully subscribed to topic: ${topic}`);
+        console.log(`Subscribed to topic: ${topic}`);
       }
     });
   
-    // Handle incoming MQTT messages as part of a subscription to an MQTT topic.
-    mqttClient.on('message', (receivedTopic, message) => {
+    // Listen for messages on the subscribed topic
+    mqttClient.on('message', async (receivedTopic, message) => {
       if (receivedTopic === topic) {
-        console.log(`Received message on ${topic}: ${message.toString()}`);
+        const cardIdMessage = JSON.parse(message.toString());
+        console.log(cardIdMessage);
+        const cardId = cardIdMessage.msg;
+        console.log(cardId);
+
+        try {
+          // Retrieve player data using the cardId
+          const playerData = await findPlayerByIdCard(cardId);
+  
+          if (playerData) {
+            console.log(`Access granted to player: ${playerData.name}`)
+          } else {
+            console.log(`Access denied for cardId: ${cardId}`);
+          }
+        } catch (error) {
+          console.error("Error retrieving player data:", error);
+        }
       }
     });
   }
   
-  function publish(mqttClient, topic, message, options = { qos: 1, retain: false }) {
-    mqttClient.publish(topic, message, options, (err) => {
-      if (err) {
-        console.error(`Failed to publish message to topic ${topic}:`, err);
-      } else {
-        console.log(`Successfully published message to topic ${topic}: ${message}`);
-      }
-    });
-  }
-  
-  module.exports = { subscribe, publish };
-  
+  module.exports = { subscribe };

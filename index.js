@@ -7,7 +7,7 @@ const mqtt = require('mqtt'); // Import the MQTT package
 const fs = require('fs');
 const topicHandler = require('./src/mqtt/topicHandler');
 
-const { updatePlayerByEmail, getAllAcolytes, toggleIsInsideLabByEmail, toggleIsInsideTowerByEmail, findPlayerByEmail } = require('./src/database/Player');
+const { updatePlayerByEmail, getAllAcolytes, toggleIsInsideLabByEmail, toggleIsInsideTowerByEmail, findPlayerByEmail} = require('./src/database/Player');
 
 
 // ------------------------------------- //
@@ -138,6 +138,7 @@ io.on("connection", (socket) => {
 ///Susbcrbe to topic 'idCard' and console.log message
 topicHandler.subscribe(mqttClient, 'idCard');
 
+//////////////////
 
 // --------------------------- //
 // -----   RUN SERVER   ------ //
