@@ -28,7 +28,7 @@ const { findPlayerByIdCard } = require('../database/Player');
             console.log(`Access granted to player: ${playerData.name}`)
 
             // Publish "open door" message to MQTT topic
-            mqttClient.publish('action', JSON.stringify({ action: 'open' }), (err) => {
+            mqttClient.publish('action', JSON.stringify({ action: 'open', email: playerData.email }), (err) => {
             if (err) {
               console.error("Failed to publish 'open door' action:", err);
             } else {
