@@ -5,7 +5,7 @@ const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const mqtt = require('mqtt'); // Import the MQTT package
 const fs = require('fs');
-const topicHandler = require('./src/mqtt/topicHandler');
+const idCardHandler = require('./src/mqtt/idCardHandler');
 
 const { updatePlayerByEmail, getAllAcolytes, toggleIsInsideLabByEmail, toggleIsInsideTowerByEmail, findPlayerByEmail} = require('./src/database/Player');
 
@@ -135,8 +135,8 @@ io.on("connection", (socket) => {
 // -----   MQTT   ------ //
 // --------------------- //
 
-///Susbcrbe to topic 'idCard' and console.log message
-topicHandler.subscribe(mqttClient, 'idCard');
+///Susbcrbe to topic 'idCard' and handle all the logic 
+idCardHandler.handleIdCardAccess(mqttClient);
 
 //////////////////
 

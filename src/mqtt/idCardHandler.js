@@ -1,6 +1,9 @@
 const { findPlayerByIdCard } = require('../database/Player');
 
-  function subscribe(mqttClient, topic) {
+  function handleIdCardAccess(mqttClient) {
+
+    const topic = 'idCard';
+
     mqttClient.subscribe(topic, (err) => {
       if (err) {
         console.error(`Failed to subscribe to topic ${topic}:`, err);
@@ -44,4 +47,4 @@ const { findPlayerByIdCard } = require('../database/Player');
     });
   }
   
-  module.exports = { subscribe };
+  module.exports = { handleIdCardAccess };
