@@ -1,4 +1,5 @@
 const { toggleIsInsideTowerByEmail } = require('../database/Player');
+const idCardHandler = require('../mqtt/idCardHandler');
 
 function handleDoorAccess(mqttClient) {
 
@@ -41,7 +42,7 @@ function handleDoorAccess(mqttClient) {
             }
 
             if (doorStatus === 'closed') {
-                //executeFunction of idCardHandler
+                idCardHandler.handleIdCardAccess(mqttClient)
                 console.log('stop');
             }
 

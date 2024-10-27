@@ -137,7 +137,7 @@ io.on("connection", (socket) => {
 // --------------------- //
 
 ///Susbcrbe to topic 'idCard' and handle all the logic 
-idCardHandler.handleIdCardAccess(mqttClient);
+// idCardHandler.handleIdCardAccess(mqttClient);
 
 ///Subscribe to topic 'doorStatus' and handle all the logic 
 doorStatusHandler.handleDoorAccess(mqttClient);
