@@ -51,7 +51,7 @@ const mqttClient = mqtt.connect(process.env.MQTT_BROKER_URL, mqttOptions);
 //Import routes
 const authRoutes = require('./src/routes/authRoutes');
 const playerRouter = require("./src/routes/playerRoutes");
-const { messageSomeoneIsTryingToEnter } = require('./src/messages/messagesTheTower');
+const { messageSomeoneIsTryingToEnter, messageSomeoneSuccesfullyOpenDoor, messageSomeoneFailedOpenDoor } = require('./src/messages/messagesTheTower');
 
 // Middleware to parse JSON
 app.use(express.json());
@@ -198,18 +198,29 @@ async function toggleAcolyteInsideTower(email) {
     // Obtain the fcm_token from the player data to send the push notification
     const fcm_token = mortimerData.fcm_token;
 
-    // Clone the message object to modify and sebd it
+    // Clone the message object to modify to send it
     const messageWarningSomeoneIsTryingToEnterTheTower = structuredClone(messageSomeoneIsTryingToEnter);
     // Add the fcm_token to the message tokens to send the message to the correct device/user
     messageWarningSomeoneIsTryingToEnterTheTower.tokens.push(fcm_token);
+
     console.log(messageWarningSomeoneIsTryingToEnterTheTower);
-    
+
     // Send message to mortimer that an acolyte is trying to access
     sendPushNotification(messageWarningSomeoneIsTryingToEnterTheTower);
 
     if (playerCurrentScreen !== "TowerDoorScreen" && playerCurrentScreen !== "Tower Screen") {
       console.log("The player is not in the screen 'TowerDoorScreen' or inside the Tower, so he can not enter or exit the tower.");
-      
+
+      // Clone the message object to modify to send it
+      const messageWarningSomeoneFailedOpeningTheTowerDoor = structuredClone(messageSomeoneFailedOpenDoor);
+      // Add the fcm_token to the message tokens to send the message to the correct device/user
+      messageWarningSomeoneFailedOpeningTheTowerDoor.tokens.push(fcm_token);
+
+      console.log(messageWarningSomeoneFailedOpeningTheTowerDoor);
+
+      // Send message to mortimer that an acolyte failed to open the door
+      sendPushNotification(messageWarningSomeoneFailedOpeningTheTowerDoor);
+
       return;
     }
 
