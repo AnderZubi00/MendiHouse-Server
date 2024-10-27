@@ -23,7 +23,18 @@ const { findPlayerByIdCard } = require('../database/Player');
   
           if (playerData) {
             console.log(`Access granted to player: ${playerData.name}`)
-          } else {
+
+            // Publish "open door" message to MQTT topic
+            mqttClient.publish('action', JSON.stringify({ action: 'open' }), (err) => {
+            if (err) {
+              console.error("Failed to publish 'open door' action:", err);
+            } else {
+              console.log("Published 'open door' action to MQTT");
+            }
+          });
+          } 
+          
+          else {
             console.log(`Access denied for cardId: ${cardId}`);
           }
         } catch (error) {
