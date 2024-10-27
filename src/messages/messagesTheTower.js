@@ -12,7 +12,7 @@ const messageSomeoneIsTryingToEnter = {
     },
 };
 
-const messageSomeoneSuccesfullyOpen = {
+const messageSomeoneSuccesfullyOpenDoor = {
 
     tokens: [],
     notification: {
@@ -25,7 +25,7 @@ const messageSomeoneSuccesfullyOpen = {
     },
 };
 
-const messageSomeoneSFailedOpen= {
+const messageSomeoneFailedOpenDoor= {
 
     tokens: [],
     notification: {
@@ -41,6 +41,6 @@ const messageSomeoneSFailedOpen= {
 
 module.exports = {
     messageSomeoneIsTryingToEnter,
-    messageSomeoneSFailedOpen,
-    messageSomeoneSuccesfullyOpen,
+    messageSomeoneFailedOpenDoor,
+    messageSomeoneSuccesfullyOpenDoor,
 }
