@@ -1,7 +1,7 @@
 const { toggleIsInsideTowerByEmail } = require('../database/Player');
 const idCardHandler = require('../mqtt/idCardHandler');
 
-function handleDoorAccess(mqttClient) {
+function handleDoorAccess(mqttClient, io) {
 
     const topic = 'doorStatus';
 
@@ -29,7 +29,17 @@ function handleDoorAccess(mqttClient) {
                 ///Consult in DB acolyte isInsideTower status (exiting or entering?)
                 //Patch to new value insInsideTower to opposite
                 //Socket new value to acolyte to change screen
-                toggleIsInsideTowerByEmail(doorEmail);
+                const updatedPlayer = await toggleIsInsideTowerByEmail(doorEmail);
+
+                // Send the updated isInsideTower status to the player's client using WebSocket
+                if (updatedPlayer && updatedPlayer.socketId) {
+                  io.to(updatedPlayer.socketId).emit('updateIsInsideTower', {
+                      isInsideTower: updatedPlayer.isInsideTower,
+                  });
+                  console.log(`Sent updated isInsideTower status to ${doorEmail}`);
+              } else {
+                  console.warn(`No active socket connection found for email: ${doorEmail}`);
+              }
 
                 // Publish "close door" message to MQTT topic
                 mqttClient.publish('action', JSON.stringify({ action: 'close' }), (err) => {

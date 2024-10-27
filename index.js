@@ -140,7 +140,7 @@ io.on("connection", (socket) => {
 // idCardHandler.handleIdCardAccess(mqttClient);
 
 ///Subscribe to topic 'doorStatus' and handle all the logic 
-doorStatusHandler.handleDoorAccess(mqttClient);
+doorStatusHandler.handleDoorAccess(mqttClient, io);
 
 //////////////////
 
