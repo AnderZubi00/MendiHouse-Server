@@ -234,6 +234,16 @@ async function toggleAcolyteInsideTower(email) {
 
     console.log('Acolyte has entered or exited the tower successfully');
 
+    // Clone the message object to modify to send it
+    const messageWarningSomeoneSuccessOpeningTheTowerDoor = structuredClone(messageSomeoneSuccesfullyOpenDoor);
+    // Add the fcm_token to the message tokens to send the message to the correct device/user
+    messageWarningSomeoneSuccessOpeningTheTowerDoor.tokens.push(fcm_token);
+
+    console.log(messageWarningSomeoneSuccessOpeningTheTowerDoor);
+
+    // Send message to mortimer that an acolyte failed to open the door
+    sendPushNotification(messageWarningSomeoneSuccessOpeningTheTowerDoor);
+
   } catch (error) {
     console.log('Error entering the acolyte to tower. Error: ', error);
   }
