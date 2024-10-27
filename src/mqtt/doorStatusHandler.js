@@ -29,8 +29,15 @@ function handleDoorAccess(mqttClient) {
                 //Patch to new value insInsideTower to opposite
                 //Socket new value to acolyte to change screen
                 toggleIsInsideTowerByEmail(doorEmail);
-                //Publish topic action with message close door
-                console.log('lets go');
+
+                // Publish "close door" message to MQTT topic
+                mqttClient.publish('action', JSON.stringify({ action: 'close' }), (err) => {
+                if (err) {
+                  console.error("Failed to publish close door' action:", err);
+                } else {
+                  console.log("Published 'close door' action to MQTT");
+                }
+              });
             }
 
             if (doorStatus === 'closed') {
