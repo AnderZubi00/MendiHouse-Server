@@ -1,0 +1,21 @@
+name: PM2 Server CI
+run-name: Deploy to Ubuntu Server 
+on:
+  push:
+    branches: [master]
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      
+      - name: Pull repo
+        run: |
+          cd ~/Documentos/MendiHouse-Server
+          git pull origin master
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Restart PM2
+        run: pm2 restart all
