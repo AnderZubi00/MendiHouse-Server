@@ -9,10 +9,7 @@ jobs:
     runs-on: self-hosted
     steps:
       
-      # - name: Navegar al Directorio de la Aplicación
-      #   run: cd ~/Documentos/MendiHouse-Server
-
-      - name: Actualizar el Repositorio
+      - name: Pull repo
         run: |
           cd ~/Documentos/MendiHouse-Server
           git pull origin master
