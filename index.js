@@ -155,6 +155,8 @@ async function start() {
 
   try {
 
+    console.log('Starting server!!!');
+
     //Start server for authentification
     httpServer.listen(PORT, '0.0.0.0', () => {
       console.log(`Server running on port ${PORT}`);
@@ -234,6 +236,7 @@ async function getPlayerScreen(email) {
         if (response[0]?.success) {
           let { data } = response[0];
           if (data) {
+
             let { route } = data;
             if (route) {
               return resolve(route);  // Resolve the promise
