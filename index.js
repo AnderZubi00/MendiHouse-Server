@@ -192,7 +192,7 @@ async function toggleAcolyteInsideTower(email) {
     let titleText = '';
 
     // Obtain the player data of Mortimer
-    const mortimerData = await findPlayerByEmail("mikel.lopez@ikasle.aeg.eus");
+    const mortimerData = await findPlayerByEmail("oskar.calvo@.aeg.eus");
     console.log("Mortimer Data: ");
     console.log(mortimerData);
 
