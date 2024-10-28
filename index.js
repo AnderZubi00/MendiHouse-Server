@@ -155,10 +155,9 @@ async function start() {
 
   try {
 
-    console.log('Starting server!!!');
-
     //Start server for authentification
     httpServer.listen(PORT, '0.0.0.0', () => {
+      console.log('HTTP Server started!');
       console.log(`Server running on port ${PORT}`);
     });
 
