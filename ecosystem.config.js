@@ -3,7 +3,7 @@ module.exports = {
       {
         name: "MendiHouse-Server",
         script: "./index.js",
-        exec_mode: "cluster_mode",
+        exec_mode: "cluster",
   
         
         // Logging
@@ -11,7 +11,6 @@ module.exports = {
         error_file: "./pm2/error.log",
         merge_logs: true,
         log_date_format: "DD-MM HH:mm:ss Z",
-        // log_type: "json",
   
       },
     ],

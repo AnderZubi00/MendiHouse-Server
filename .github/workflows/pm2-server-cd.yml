@@ -1,4 +1,4 @@
-name: PM2 Server CI
+name: PM2 Server Continious Deployment
 run-name: Deploy to Ubuntu Server 
 on:
   push:
