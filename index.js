@@ -155,12 +155,8 @@ async function start() {
 
   try {
 
-    console.log('THIS TEXT SHOULD APPEAR IN SERVER!!');
-    console.log('THIS TEXT SHOULD ALSO APPEAR IN SERVER!!');
-
     //Start server for authentification
     httpServer.listen(PORT, '0.0.0.0', () => {
-      console.log('HTTP Server started!');
       console.log(`Server running on port ${PORT}`);
     });
 
