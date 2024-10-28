@@ -1,46 +1,27 @@
 
-const messageSomeoneIsTryingToEnter = {
 
-    tokens: [],
-    notification: {
-        body: 'An acolyte is trying to open the door to access to the tower.',
-        title: 'Something is moving on the tower door!!!',
-    },
-    android: {
-        notification: {
-        },
-    },
-};
+class Message {
 
-const messageSomeoneSuccesfullyOpenDoor = {
+    constructor(bodyText, titleText, tokens) {
+        this.tokens = tokens,
+            this.notification = {
+                body: bodyText,
+                title: titleText,
+            },
+            this.android = {
+                notification: {
+                },
+            }
+    }
 
-    tokens: [],
-    notification: {
-        body: 'An acolyte tried to open the door fo the tower and success.',
-        title: 'The tower door is opening!!!',
-    },
-    android: {
-        notification: {
-        },
-    },
-};
 
-const messageSomeoneFailedOpenDoor= {
+}
 
-    tokens: [],
-    notification: {
-        body: 'An acolyte tried to open the door fo the tower and failed.',
-        title: 'The tower door is still closed!!!',
-    },
-    android: {
-        notification: {
-        },
-    },
-};
+function createMessageForPushNotification(bodyText = '', titleText = '', tokens = []) {
+    return (new Message(bodyText, titleText, tokens));
+}
 
 
 module.exports = {
-    messageSomeoneIsTryingToEnter,
-    messageSomeoneFailedOpenDoor,
-    messageSomeoneSuccesfullyOpenDoor,
+    createMessageForPushNotification,
 }
