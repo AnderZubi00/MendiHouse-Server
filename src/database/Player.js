@@ -154,6 +154,30 @@ const findPlayerByEmail = async (email) => {
     }
 };
 
+const findPlayerByIdCard = async (cardId) => {
+  if (!cardId) {
+    console.error("Invalid cardId received. Cannot retrieve player data.");
+      // Stop further processing
+      return null;
+  }
+
+  try {
+    console.log("Getting data player by cardId:", cardId);
+    const player = await Player.find({ cardId: cardId });
+
+    // Check if player is found
+    if (player.length === 0) {
+      console.log(`No player found with cardId: ${cardId}`);
+      return null;
+    }
+
+    return player[0];
+  } catch (error) {
+    console.error(`Error getting the player by cardId (${cardId}):`, error);
+    throw error;
+  }
+};
+
 
 module.exports = {
     getAllPlayers,
@@ -162,5 +186,6 @@ module.exports = {
     updatePlayerByEmail,
     findPlayerByEmail,
     toggleIsInsideLabByEmail,
-    toggleIsInsideTowerByEmail
+    toggleIsInsideTowerByEmail,
+    findPlayerByIdCard
 }

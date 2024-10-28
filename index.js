@@ -5,8 +5,14 @@ const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const mqtt = require('mqtt'); // Import the MQTT package
 const fs = require('fs');
+const admin = require('firebase-admin')
+const idCardHandler = require('./src/mqtt/idCardHandler');
+const doorStatusHandler = require('./src/mqtt/doorStatusHandler');
 
 const { updatePlayerByEmail, getAllAcolytes, toggleIsInsideLabByEmail, toggleIsInsideTowerByEmail, findPlayerByEmail } = require('./src/database/Player');
+// Import function to create the message object for the push notifications
+const  {createMessageForPushNotification} = require('./src/messages/messagePushNotifications');
+
 
 
 // ------------------------------------- //
@@ -25,7 +31,7 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: "*",  
+    origin: "*",
     methods: ["GET", "POST"]
   }
 });
@@ -35,13 +41,14 @@ const io = new Server(httpServer, {
 //Load the certificates
 const mqttOptions = {
   clientId: 'MendiHouse-Node.js',
-  // key: fs.readFileSync('./certificates/server.key'),
-  // cert: fs.readFileSync('./certificates/server.crt'),
-  // ca: fs.readFileSync('./certificates/ca.crt'),
-  // rejectUnauthorized: true
-}; 
+  key: fs.readFileSync('./certificates/server.key'),
+  cert: fs.readFileSync('./certificates/server.crt'),
+  ca: fs.readFileSync('./certificates/ca.crt'),
+  rejectUnauthorized: true
+};
 
-const mqttClient = mqtt.connect(process.env.MQTT_BROKER_URL, mqttOptions);
+// const mqttClient = mqtt.connect(process.env.MQTT_BROKER_URL, mqttOptions); // Para añadir los certificados a la conexion
+const mqttClient = mqtt.connect(process.env.MQTT_BROKER_URL);
 
 // ------------------------ //
 // -----   REST API   ----- //
@@ -69,25 +76,25 @@ const PORT = process.env.PORT || 3000;
 // Create a conection with a client device 
 io.on("connection", (socket) => {
 
-  console.log("\nConnection is made with the following socket id ---> "+ socket.id);
+  console.log("\nConnection is made with the following socket id ---> " + socket.id);
   // Return the socket Id  to the client using a socket
   io.to(socket.id).emit("connection", { socketId: socket.id });
-  
+
   // Add to listen to the function to update the socket Id of the client
   socket.on("updateSocketId", (emailSocketId) => {
-    
-      console.log("\n========= UPDATE SOCKET ID =========");
-      
-      console.log("Update the socket id with the following data:");
-      console.log("     email --> "+ emailSocketId.email);
-      console.log("     socketId --> "+ emailSocketId.socketId);
-      
-      // Convert string to object
-      const socketIdObject = {socketId: emailSocketId.socketId};
-      
-      // Update the socketId
-      updatePlayerByEmail(emailSocketId.email, socketIdObject);
-      
+
+    console.log("\n========= UPDATE SOCKET ID =========");
+
+    console.log("Update the socket id with the following data:");
+    console.log("     email --> " + emailSocketId.email);
+    console.log("     socketId --> " + emailSocketId.socketId);
+
+    // Convert string to object
+    const socketIdObject = { socketId: emailSocketId.socketId };
+
+    // Update the socketId
+    updatePlayerByEmail(emailSocketId.email, socketIdObject);
+
   });
 
   socket.on("acolyteScanned", async (data) => {
@@ -106,21 +113,21 @@ io.on("connection", (socket) => {
 
       // Await the asynchronous operation to ensure it completes
       const newPlayerData = await toggleIsInsideLabByEmail(acolyteEmail);
-  
+
       console.log("SOCKETID: ", newPlayerData.socketId);
 
       // Send confirmation message to the client who scanned the acolyte
       io.to(newPlayerData.socketId).emit("acolyteScannedResponse", { success: true, playerData: newPlayerData }); /// Acolyte
       io.to(socket.id).emit("acolyteScannedResponse", { success: true, playerData: newPlayerData }); // Istvan
-   
+
       // Notify clients to refresh Mortimer's list
       const acolyteList = await getAllAcolytes();
       io.emit("refreshMortimerList", acolyteList);
-  
+
     } catch (error) {
 
       console.log('Error in method acolyteScanned. Error: ', error);
-  
+
       // Send error message to the client
       io.to(data.socket).emit("acolyteScannedResponse", { success: false, erorMessage: error });
       io.to(socket.id).emit("acolyteScannedResponse", { success: false, erorMessage: error });
@@ -134,18 +141,13 @@ io.on("connection", (socket) => {
 // -----   MQTT   ------ //
 // --------------------- //
 
-// MQTT connection event
-mqttClient.on('connect', () => {
-  console.log('Connected securely to MQTT broker');
-});
+///Susbcrbe to topic 'idCard' and handle all the logic 
+// idCardHandler.handleIdCardAccess(mqttClient);
 
+///Subscribe to topic 'doorStatus' and handle all the logic 
+doorStatusHandler.handleDoorAccess(mqttClient, io);
 
-// Handle incoming MQTT messages as part of a subscription to an MQTT topic.
-mqttClient.on('message', (topic, message) => {
-  console.log(`Received MQTT message on topic ${topic}: ${message.toString()}`);
-  // Here you can handle incoming messages as needed
-});// Implement the subscriptions and publications here...
-
+//////////////////
 
 // --------------------------- //
 // -----   RUN SERVER   ------ //
@@ -163,10 +165,10 @@ async function start() {
     // Connect to mongoose
     await mongoose.connect(mongodbRoute, {});
     console.log('Conexion con Mongo correcta');
-    
+
   } catch (error) {
     console.log(`<<ERROR>> connecting to the database: ${error.message}`);
-    
+
   }
 }
 
@@ -186,21 +188,66 @@ async function toggleAcolyteInsideTower(email) {
     if (!email) throw new Error("Email parameter is null or undefined");
 
     let playerCurrentScreen = await getPlayerScreen(email);
+    let bodyText = '';
+    let titleText = '';
+
+    // Obtain the player data of Mortimer
+    const mortimerData = await findPlayerByEmail("oskar.calvo@.aeg.eus");
+    console.log("Mortimer Data: ");
+    console.log(mortimerData);
+
+
+    // Obtain the fcm_token from the player data to send the push notification
+    const fcm_tokens = [];
+    fcm_tokens.push(mortimerData.fcm_token);
+
+    // Add the text to the message body and title, for the message we want to send on the push notification
+    bodyText = 'An acolyte is trying to open the door of The Tower.';
+    titleText = 'Something is moving on the tower door!!!';
+
+    // Create the message object to modify to send it, with fcm_token to send the message to the correct device/user
+    const messageWarningSomeoneIsTryingToEnterTheTower = createMessageForPushNotification(bodyText, titleText, fcm_tokens);
+
+    // Send message to mortimer that an acolyte is trying to access
+    sendPushNotification(messageWarningSomeoneIsTryingToEnterTheTower);
 
     if (playerCurrentScreen !== "TowerDoorScreen" && playerCurrentScreen !== "Tower Screen") {
       console.log("The player is not in the screen 'TowerDoorScreen' or inside the Tower, so he can not enter or exit the tower.");
+
+      // Add the text to the message body and title, for the message we want to send on the push notification
+      bodyText = 'An acolyte tried to open the door of The Tower and failed.';
+      titleText = 'The tower door is still closed!!!';
+
+      // Create the message object to modify to send it, with fcm_token to send the message to the correct device/user
+      const messageWarningSomeoneFailedOpeningTheTowerDoor = createMessageForPushNotification(bodyText, titleText, fcm_tokens);
+
+      // Send message to mortimer that an acolyte failed to open the door
+      sendPushNotification(messageWarningSomeoneFailedOpeningTheTowerDoor);
+
       return;
     }
-    
+
     // Await the asynchronous operation to ensure it completes
     const newPlayerData = await toggleIsInsideTowerByEmail(email);
-    
+
     console.log("SocketId: ", newPlayerData.socketId);
 
     // Send confirmation message to the client who scanned the acolyte
-    io.to(newPlayerData.socketId).emit("toggleInsideTower", { success: true, playerData: newPlayerData }); 
+    io.to(newPlayerData.socketId).emit("toggleInsideTower", { success: true, playerData: newPlayerData });
 
     console.log('Acolyte has entered or exited the tower successfully');
+
+    // Add the text to the message body and title, for the message we want to send on the push notification
+    bodyText = 'An acolyte tried to open the door fo The Tower and success.';
+    titleText = 'The tower door has been opened!!!';
+
+    // Create the message object to modify to send it, with fcm_token to send the message to the correct device/user
+    const messageWarningSomeoneSuccessOpeningTheTowerDoor = createMessageForPushNotification(bodyText, titleText, fcm_tokens);
+
+    console.log(messageWarningSomeoneSuccessOpeningTheTowerDoor);
+
+    // Send message to mortimer that an acolyte failed to open the door
+    sendPushNotification(messageWarningSomeoneSuccessOpeningTheTowerDoor);
 
   } catch (error) {
     console.log('Error entering the acolyte to tower. Error: ', error);
@@ -252,8 +299,20 @@ async function getPlayerScreen(email) {
 
   } catch (error) {
     console.log('Error en getPlayerScreen:', error);
-    throw error; 
+    throw error;
   }
 }
 
 
+function sendPushNotification(message) {
+
+  admin
+    .messaging()
+    .sendEachForMulticast(message)
+    .then(response => {
+      console.log('Successfully sent message:', response);
+    })
+    .catch(error => {
+      console.log('Error sending message:', error);
+    });
+}

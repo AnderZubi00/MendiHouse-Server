@@ -26,7 +26,8 @@ const playerSchema = new Schema({
     isInsideLab: Boolean,
     isInsideTower: Boolean,
     fcm_token: String,
-    role: String
+    role: String,
+    cardId: String
 });
 
 // Exportamos el modelo para usarlo en otros ficheros
