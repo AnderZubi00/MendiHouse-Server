@@ -6,8 +6,10 @@ const mongoose = require('mongoose');
 const mqtt = require('mqtt'); // Import the MQTT package
 const fs = require('fs');
 const admin = require('firebase-admin')
+const idCardHandler = require('./src/mqtt/idCardHandler');
+const doorStatusHandler = require('./src/mqtt/doorStatusHandler');
 
-const { updatePlayerByEmail, getAllAcolytes, toggleIsInsideLabByEmail, toggleIsInsideTowerByEmail, findPlayerByEmail } = require('./src/database/Player');
+const { updatePlayerByEmail, getAllAcolytes, toggleIsInsideLabByEmail, toggleIsInsideTowerByEmail, findPlayerByEmail} = require('./src/database/Player');
 
 
 // ------------------------------------- //
@@ -36,13 +38,14 @@ const io = new Server(httpServer, {
 //Load the certificates
 const mqttOptions = {
   clientId: 'MendiHouse-Node.js',
-  // key: fs.readFileSync('./certificates/server.key'),
-  // cert: fs.readFileSync('./certificates/server.crt'),
-  // ca: fs.readFileSync('./certificates/ca.crt'),
-  // rejectUnauthorized: true
-};
+  key: fs.readFileSync('./certificates/server.key'),
+  cert: fs.readFileSync('./certificates/server.crt'),
+  ca: fs.readFileSync('./certificates/ca.crt'),
+  rejectUnauthorized: true
+}; 
 
-const mqttClient = mqtt.connect(process.env.MQTT_BROKER_URL, mqttOptions);
+// const mqttClient = mqtt.connect(process.env.MQTT_BROKER_URL, mqttOptions); // Para añadir los certificados a la conexion
+const mqttClient = mqtt.connect(process.env.MQTT_BROKER_URL);
 
 // ------------------------ //
 // -----   REST API   ----- //
@@ -136,18 +139,13 @@ io.on("connection", (socket) => {
 // -----   MQTT   ------ //
 // --------------------- //
 
-// MQTT connection event
-mqttClient.on('connect', () => {
-  console.log('Connected securely to MQTT broker');
-});
+///Susbcrbe to topic 'idCard' and handle all the logic 
+// idCardHandler.handleIdCardAccess(mqttClient);
 
+///Subscribe to topic 'doorStatus' and handle all the logic 
+doorStatusHandler.handleDoorAccess(mqttClient, io);
 
-// Handle incoming MQTT messages as part of a subscription to an MQTT topic.
-mqttClient.on('message', (topic, message) => {
-  console.log(`Received MQTT message on topic ${topic}: ${message.toString()}`);
-  // Here you can handle incoming messages as needed
-});// Implement the subscriptions and publications here...
-
+//////////////////
 
 // --------------------------- //
 // -----   RUN SERVER   ------ //

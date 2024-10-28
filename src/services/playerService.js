@@ -49,6 +49,8 @@ const createPlayer = async (playerData) => {
         playerData.role = getRole(playerData);
         playerData.socketId = null;
         playerData.isInsideLab = false;
+        playerData.isInsideTower = false;
+        playerData.cardId = null;
 
         const newPlayer = await Player.createPlayer(playerData);
         return newPlayer;
