@@ -9,7 +9,10 @@ const admin = require('firebase-admin')
 const idCardHandler = require('./src/mqtt/idCardHandler');
 const doorStatusHandler = require('./src/mqtt/doorStatusHandler');
 
-const { updatePlayerByEmail, getAllAcolytes, toggleIsInsideLabByEmail, toggleIsInsideTowerByEmail, findPlayerByEmail} = require('./src/database/Player');
+const { updatePlayerByEmail, getAllAcolytes, toggleIsInsideLabByEmail, toggleIsInsideTowerByEmail, findPlayerByEmail } = require('./src/database/Player');
+// Import function to create the message object for the push notifications
+const  {createMessageForPushNotification} = require('./src/messages/messagePushNotifications');
+
 
 
 // ------------------------------------- //
@@ -42,7 +45,7 @@ const mqttOptions = {
   cert: fs.readFileSync('./certificates/server.crt'),
   ca: fs.readFileSync('./certificates/ca.crt'),
   rejectUnauthorized: true
-}; 
+};
 
 // const mqttClient = mqtt.connect(process.env.MQTT_BROKER_URL, mqttOptions); // Para añadir los certificados a la conexion
 const mqttClient = mqtt.connect(process.env.MQTT_BROKER_URL);
@@ -54,7 +57,6 @@ const mqttClient = mqtt.connect(process.env.MQTT_BROKER_URL);
 //Import routes
 const authRoutes = require('./src/routes/authRoutes');
 const playerRouter = require("./src/routes/playerRoutes");
-const { messageSomeoneIsTryingToEnter, messageSomeoneSuccesfullyOpenDoor, messageSomeoneFailedOpenDoor } = require('./src/messages/messagesTheTower');
 
 // Middleware to parse JSON
 app.use(express.json());
@@ -186,22 +188,25 @@ async function toggleAcolyteInsideTower(email) {
     if (!email) throw new Error("Email parameter is null or undefined");
 
     let playerCurrentScreen = await getPlayerScreen(email);
+    let bodyText = '';
+    let titleText = '';
 
     // Obtain the player data of Mortimer
-    const mortimerData = await findPlayerByEmail("aitor.mendiburu@ikasle.aeg.eus");
+    const mortimerData = await findPlayerByEmail("mikel.lopez@ikasle.aeg.eus");
     console.log("Mortimer Data: ");
     console.log(mortimerData);
 
 
     // Obtain the fcm_token from the player data to send the push notification
-    const fcm_token = mortimerData.fcm_token;
+    const fcm_tokens = [];
+    fcm_tokens.push(mortimerData.fcm_token);
 
-    // Clone the message object to modify to send it
-    const messageWarningSomeoneIsTryingToEnterTheTower = structuredClone(messageSomeoneIsTryingToEnter);
-    // Add the fcm_token to the message tokens to send the message to the correct device/user
-    messageWarningSomeoneIsTryingToEnterTheTower.tokens.push(fcm_token);
+    // Add the text to the message body and title, for the message we want to send on the push notification
+    bodyText = 'An acolyte is trying to open the door of The Tower.';
+    titleText = 'Something is moving on the tower door!!!';
 
-    console.log(messageWarningSomeoneIsTryingToEnterTheTower);
+    // Create the message object to modify to send it, with fcm_token to send the message to the correct device/user
+    const messageWarningSomeoneIsTryingToEnterTheTower = createMessageForPushNotification(bodyText, titleText, fcm_tokens);
 
     // Send message to mortimer that an acolyte is trying to access
     sendPushNotification(messageWarningSomeoneIsTryingToEnterTheTower);
@@ -209,12 +214,12 @@ async function toggleAcolyteInsideTower(email) {
     if (playerCurrentScreen !== "TowerDoorScreen" && playerCurrentScreen !== "Tower Screen") {
       console.log("The player is not in the screen 'TowerDoorScreen' or inside the Tower, so he can not enter or exit the tower.");
 
-      // Clone the message object to modify to send it
-      const messageWarningSomeoneFailedOpeningTheTowerDoor = structuredClone(messageSomeoneFailedOpenDoor);
-      // Add the fcm_token to the message tokens to send the message to the correct device/user
-      messageWarningSomeoneFailedOpeningTheTowerDoor.tokens.push(fcm_token);
+      // Add the text to the message body and title, for the message we want to send on the push notification
+      bodyText = 'An acolyte tried to open the door of The Tower and failed.';
+      titleText = 'The tower door is still closed!!!';
 
-      console.log(messageWarningSomeoneFailedOpeningTheTowerDoor);
+      // Create the message object to modify to send it, with fcm_token to send the message to the correct device/user
+      const messageWarningSomeoneFailedOpeningTheTowerDoor = createMessageForPushNotification(bodyText, titleText, fcm_tokens);
 
       // Send message to mortimer that an acolyte failed to open the door
       sendPushNotification(messageWarningSomeoneFailedOpeningTheTowerDoor);
@@ -232,10 +237,12 @@ async function toggleAcolyteInsideTower(email) {
 
     console.log('Acolyte has entered or exited the tower successfully');
 
-    // Clone the message object to modify to send it
-    const messageWarningSomeoneSuccessOpeningTheTowerDoor = structuredClone(messageSomeoneSuccesfullyOpenDoor);
-    // Add the fcm_token to the message tokens to send the message to the correct device/user
-    messageWarningSomeoneSuccessOpeningTheTowerDoor.tokens.push(fcm_token);
+    // Add the text to the message body and title, for the message we want to send on the push notification
+    bodyText = 'An acolyte tried to open the door fo The Tower and success.';
+    titleText = 'The tower door has been opened!!!';
+
+    // Create the message object to modify to send it, with fcm_token to send the message to the correct device/user
+    const messageWarningSomeoneSuccessOpeningTheTowerDoor = createMessageForPushNotification(bodyText, titleText, fcm_tokens);
 
     console.log(messageWarningSomeoneSuccessOpeningTheTowerDoor);
 
@@ -295,9 +302,6 @@ async function getPlayerScreen(email) {
   }
 }
 
-async function getDataFromTheEmail(email) {
-
-}
 
 function sendPushNotification(message) {
 
