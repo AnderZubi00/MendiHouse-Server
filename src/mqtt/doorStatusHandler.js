@@ -18,7 +18,7 @@ function handleDoorAccess(mqttClient, io) {
         if (receivedTopic === topic) {
           const doorMessage = JSON.parse(message.toString());
           console.log(doorMessage);
-          const doorStatus = doorMessage.msg;
+          const doorStatus = doorMessage.status;
           console.log(doorStatus);
           const doorEmail = doorMessage.email;
           console.log(doorEmail); //this is sent when published action doorOpen + email

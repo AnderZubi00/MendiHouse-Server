@@ -1,8 +1,10 @@
-const { findPlayerByIdCard } = require('../database/Player');
+const { findPlayerByIdCard, findPlayersByRole } = require('../database/Player');
+const { toggleAcolyteInsideTower, sendPushNotification } = require('../utils/utils');
+const  {createMessageForPushNotification} = require('../messages/messagePushNotifications');
 
-  function handleIdCardAccess(mqttClient) {
+  function handleIdCardAccess(io, mqttClient) {
 
-    const topic = 'idCard';
+    const topic = 'cardId';
 
     mqttClient.subscribe(topic, (err) => {
       if (err) {
@@ -17,28 +19,38 @@ const { findPlayerByIdCard } = require('../database/Player');
       if (receivedTopic === topic) {
         const cardIdMessage = JSON.parse(message.toString());
         console.log(cardIdMessage);
-        const cardId = cardIdMessage.msg;
+        const cardId = cardIdMessage.cardId;
         console.log(cardId);
 
         try {
           // Retrieve player data using the cardId
           const playerData = await findPlayerByIdCard(cardId);
+          console.log(playerData);
   
           if (playerData) {
-            console.log(`Access granted to player: ${playerData.name}`)
-
-            // Publish "open door" message to MQTT topic
-            mqttClient.publish('action', JSON.stringify({ action: 'open', email: playerData.email }), (err) => {
-            if (err) {
-              console.error("Failed to publish 'open door' action:", err);
-            } else {
-              console.log("Published 'open door' action to MQTT");
-            }
-          });
-          } 
-          
-          else {
+            await toggleAcolyteInsideTower(playerData.email, io, mqttClient);
+          }  else {
             console.log(`Access denied for cardId: ${cardId}`);
+          
+            mqttClient.publish('doorAction', JSON.stringify({ action: 'error' }), (err) => {
+              if (err) {
+                console.error("Failed to publish 'doorAction' topic:", err);
+              } else {
+                console.log("Published 'doorAction' action to MQTT");
+              }
+            });
+
+            // PUSH to mortymer "acolyte didnt enter"
+            bodyText = 'Someone has tried to enter the tower. The access have been denied.';
+            titleText = 'Tower access denied';
+        
+            // Obtain the fcm_token from the Mortimer players array to send the push notification
+            const mortimers = await findPlayersByRole("MORTIMER");
+            const fcm_tokens = mortimers.map(mortimer => mortimer.fcm_token);
+
+            // Create the message object to modify to send it, with fcm_token to send the message to the correct device/user
+            const messageDeniedAccess = createMessageForPushNotification(bodyText, titleText, fcm_tokens);
+            sendPushNotification(messageDeniedAccess);
           }
         } catch (error) {
           console.error("Error retrieving player data:", error);

@@ -178,6 +178,32 @@ const findPlayerByIdCard = async (cardId) => {
   }
 };
 
+const findPlayersByRole = async (role) => {
+
+  try {
+
+    console.log("Finding players by role: ", role);
+
+    if (!role) {
+      throw new Error("No role specified."); 
+    } 
+
+    const players = await Player.find({ role: role });
+
+    // Check if player is found
+    if (players.length === 0) {
+      console.log(`No player found with role: ${role}`);
+      return null;
+    }
+
+    return players;
+
+  } catch (error) {
+    console.error(`Error getting the player by role (${role}):`, error);
+    throw error;
+  }
+};
+
 
 module.exports = {
     getAllPlayers,
@@ -187,5 +213,6 @@ module.exports = {
     findPlayerByEmail,
     toggleIsInsideLabByEmail,
     toggleIsInsideTowerByEmail,
-    findPlayerByIdCard
+    findPlayerByIdCard,
+    findPlayersByRole
 }
