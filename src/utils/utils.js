@@ -51,7 +51,7 @@ async function getPlayerScreen(email, io) {
     }
 }
   
-async function toggleAcolyteInsideTower(email, io, mqttClient) {
+async function toggleAcolyteInsideTower(email, io) {
 
     try {
       console.log("\n========= TOOGLE ACOLYTE INSIDE TOWER =========");
@@ -128,5 +128,6 @@ function sendPushNotification(message) {
 
   module.exports = {
     toggleAcolyteInsideTower,
-    sendPushNotification
+    sendPushNotification,
+    getPlayerScreen
   }

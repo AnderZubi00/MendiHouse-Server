@@ -44,8 +44,8 @@ const mqttOptions = {
   rejectUnauthorized: true
 };
 
-// const mqttClient = mqtt.connect(process.env.MQTT_BROKER_URL, mqttOptions); // Para añadir los certificados a la conexion
-const mqttClient = mqtt.connect(process.env.MQTT_BROKER_URL);
+const mqttClient = mqtt.connect(process.env.MQTT_BROKER_URL, mqttOptions); // Para añadir los certificados a la conexion
+//const mqttClient = mqtt.connect(process.env.MQTT_BROKER_URL);
 
 // ------------------------ //
 // -----   REST API   ----- //
@@ -143,7 +143,7 @@ idCardHandler.handleIdCardAccess(io, mqttClient);
 
 
 ///Subscribe to topic 'doorStatus' and handle all the logic 
-// doorStatusHandler.handleDoorAccess(mqttClient, io);
+doorStatusHandler.handleDoorAccess(mqttClient, io);
 
 //////////////////
 

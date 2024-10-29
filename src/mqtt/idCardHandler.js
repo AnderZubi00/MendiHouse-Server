@@ -1,5 +1,5 @@
 const { findPlayerByIdCard, findPlayersByRole } = require('../database/Player');
-const { toggleAcolyteInsideTower, sendPushNotification } = require('../utils/utils');
+const { toggleAcolyteInsideTower, sendPushNotification, getPlayerScreen } = require('../utils/utils');
 const  {createMessageForPushNotification} = require('../messages/messagePushNotifications');
 
   function handleIdCardAccess(io, mqttClient) {
@@ -23,11 +23,22 @@ const  {createMessageForPushNotification} = require('../messages/messagePushNoti
         console.log(cardId);
 
         try {
+          
           // Retrieve player data using the cardId
           const playerData = await findPlayerByIdCard(cardId);
           // console.log(playerData);
-  
-          if (playerData) {
+          
+          if (playerData ) {
+
+              const playerCurrentScreen = await getPlayerScreen(playerData.email, io);
+              console.log("playerCurrentScreen");
+              console.log(playerCurrentScreen);
+
+              if (playerCurrentScreen !== "TowerDoorScreen" && playerCurrentScreen !== "Tower Screen") {
+                console.log("The player is not in the screen 'TowerDoorScreen' or inside the Tower, so he can not enter or exit the tower.");
+                return;
+              }
+
               // Notify ESP32 that has to open.
               mqttClient.publish('doorAction', JSON.stringify({ action: 'open', email: playerData.email }), (err) => {
                 if (err) {
