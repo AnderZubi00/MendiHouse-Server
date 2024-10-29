@@ -107,15 +107,6 @@ async function toggleAcolyteInsideTower(email, io, mqttClient) {
       // Send message to mortimer that an acolyte failed to open the door
       sendPushNotification(messageWarningSomeoneSuccessOpeningTheTowerDoor);
 
-      // Notify ESP32 that has to open.
-      mqttClient.publish('doorAction', JSON.stringify({ action: 'open', email: newPlayerData.email }), (err) => {
-        if (err) {
-          console.error("Failed to publish 'doorAction' topic:", err);
-        } else {
-          console.log("Published 'open door' action to MQTT");
-        }
-      });
-
     } catch (error) {
       console.log('Error entering the acolyte to tower. Error: ', error);
     }

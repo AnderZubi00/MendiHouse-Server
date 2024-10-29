@@ -25,10 +25,17 @@ const  {createMessageForPushNotification} = require('../messages/messagePushNoti
         try {
           // Retrieve player data using the cardId
           const playerData = await findPlayerByIdCard(cardId);
-          console.log(playerData);
+          // console.log(playerData);
   
           if (playerData) {
-            await toggleAcolyteInsideTower(playerData.email, io, mqttClient);
+              // Notify ESP32 that has to open.
+              mqttClient.publish('doorAction', JSON.stringify({ action: 'open', email: playerData.email }), (err) => {
+                if (err) {
+                  console.error("Failed to publish 'doorAction' topic:", err);
+                } else {
+                  console.log("Published 'open door' action to MQTT");
+                }
+              });
           }  else {
             console.log(`Access denied for cardId: ${cardId}`);
           
