@@ -1,4 +1,5 @@
 const { toggleAcolyteInsideTower } = require('../utils/utils');
+const { findEmailByAccessToken } = require('../database/Token');
 
 function handleDoorAccess(mqttClient, io) {
 
@@ -21,13 +22,23 @@ function handleDoorAccess(mqttClient, io) {
           const doorStatus = doorMessage.doorStatus;
           console.log("doorStatus");
           console.log(doorStatus);
-          const doorEmail = doorMessage.email;
-          console.log("doorEmail"); //this is sent when published action doorOpen + email
-          console.log(doorEmail); //this is sent when published action doorOpen + email
+          const doorToken = doorMessage.token;
+          console.log("doorToken"); 
+          console.log(doorToken); //this is sent when published action doorOpen + token
 
           //desde esp32 recibes message of opened door y para quien (asi evitamos que pase otro y le pasamos el email a BD para decir que eeee se abre solo para este email)
 
             if (doorStatus === 'opened') {
+
+              try {
+                // Retrieve email associated with the token
+                const doorEmail = await findEmailByAccessToken(doorToken);
+
+                if (!doorEmail) {
+                    console.error("Invalid access token. No associated email found.");
+                    return;
+                }
+
               ///Consult in DB acolyte isInsideTower status (exiting or entering?)
               //Patch to new value insInsideTower to opposite
               //Socket new value to acolyte to change screen
@@ -42,7 +53,10 @@ function handleDoorAccess(mqttClient, io) {
                   console.log("Published 'close door' action to MQTT");
                 }
               });
-            }
+            } catch (error) {
+              console.error("Error handling door access:", error);
+              }
+          }
         }
       });
     }

@@ -1,4 +1,5 @@
 const { findPlayerByIdCard, findPlayersByRole } = require('../database/Player');
+const { storeAccessToken } = require('../database/Token');
 const { toggleAcolyteInsideTower, sendPushNotification, getPlayerScreen } = require('../utils/utils');
 const  {createMessageForPushNotification} = require('../messages/messagePushNotifications');
 
@@ -39,8 +40,14 @@ const  {createMessageForPushNotification} = require('../messages/messagePushNoti
                 return;
               }
 
+              // Generate a temporary access token
+              const accessToken = crypto.randomUUID();
+              
+              // Store token and email association in MonogDB
+              await storeAccessToken(accessToken, playerData.email);
+
               // Notify ESP32 that has to open.
-              mqttClient.publish('doorAction', JSON.stringify({ action: 'open', email: playerData.email }), (err) => {
+              mqttClient.publish('doorAction', JSON.stringify({ action: 'open', token: accessToken}), (err) => {
                 if (err) {
                   console.error("Failed to publish 'doorAction' topic:", err);
                 } else {
