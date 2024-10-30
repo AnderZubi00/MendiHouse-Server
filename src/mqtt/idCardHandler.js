@@ -18,9 +18,8 @@ const  {createMessageForPushNotification} = require('../messages/messagePushNoti
     // Listen for messages on the subscribed topic
     mqttClient.on('message', async (receivedTopic, message) => {
       if (receivedTopic === topic) {
-        const cardIdMessage = JSON.parse(message.toString());
-        console.log(cardIdMessage);
-        const cardId = cardIdMessage.cardId;
+        console.log("mensaje puro: " + message);
+        const cardId = message;
         console.log(cardId);
 
         try {
