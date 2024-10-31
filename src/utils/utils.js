@@ -51,7 +51,7 @@ async function getPlayerScreen(email, io) {
     }
 }
   
-async function toggleAcolyteInsideTower(email, io) {
+async function toggleAcolyteInsideTower(email, io, mqttClient) {
 
     try {
       console.log("\n========= TOOGLE ACOLYTE INSIDE TOWER =========");
@@ -80,10 +80,7 @@ async function toggleAcolyteInsideTower(email, io) {
       // Send message to mortimer that an acolyte is trying to access
       sendPushNotification(messageWarningSomeoneIsTryingToEnterTheTower);
   
-      if (playerCurrentScreen !== "TowerDoorScreen" && playerCurrentScreen !== "Tower Screen") {
-        console.log("The player is not in the screen 'TowerDoorScreen' or inside the Tower, so he can not enter or exit the tower.");
-        return;
-      }
+      if (!isPlayerInsideTowerScreens(mqttClient)) return;
   
       // Await the asynchronous operation to ensure it completes
       const newPlayerData = await toggleIsInsideTowerByEmail(email);
@@ -112,6 +109,27 @@ async function toggleAcolyteInsideTower(email, io) {
     }
 }
 
+function isPlayerInsideTowerScreens(mqttClient) {
+
+  if (playerCurrentScreen !== "TowerDoorScreen" && playerCurrentScreen !== "Tower Screen") {
+    console.log("The player is not in the screen 'TowerDoorScreen' or inside the Tower, so he can not enter or exit the tower.");
+
+    // Notify ESP32 that player can not enter the tower.
+    mqttClient.publish('doorAction', JSON.stringify({ action: 'error' }), (err) => {
+      if (err) {
+        console.error("Failed to publish 'doorAction' topic:", err);
+      } else {
+        console.log("Published 'open door' action to MQTT");
+      }
+    });
+
+    return false;
+  } 
+
+  return true;
+
+}
+
 
 function sendPushNotification(message) {
 
@@ -129,5 +147,6 @@ function sendPushNotification(message) {
   module.exports = {
     toggleAcolyteInsideTower,
     sendPushNotification,
-    getPlayerScreen
+    getPlayerScreen,
+    isPlayerInsideTowerScreens
   }

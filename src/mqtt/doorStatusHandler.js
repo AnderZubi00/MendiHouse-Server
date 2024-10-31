@@ -43,7 +43,7 @@ function handleDoorAccess(mqttClient, io) {
               //Patch to new value insInsideTower to opposite
               //Socket new value to acolyte to change screen
               
-              await toggleAcolyteInsideTower(doorEmail, io);
+              await toggleAcolyteInsideTower(doorEmail, io, mqttClient);
 
               // Publish "close door" message to MQTT topic
               mqttClient.publish('doorAction', JSON.stringify({ action: 'close' }), (err) => {

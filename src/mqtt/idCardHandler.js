@@ -1,6 +1,6 @@
 const { findPlayerByIdCard, findPlayersByRole } = require('../database/Player');
 const { storeAccessToken } = require('../database/Token');
-const { toggleAcolyteInsideTower, sendPushNotification, getPlayerScreen } = require('../utils/utils');
+const { toggleAcolyteInsideTower, sendPushNotification, getPlayerScreen, isPlayerInsideTowerScreens } = require('../utils/utils');
 const  {createMessageForPushNotification} = require('../messages/messagePushNotifications');
 
   function handleIdCardAccess(io, mqttClient) {
@@ -34,10 +34,7 @@ const  {createMessageForPushNotification} = require('../messages/messagePushNoti
               console.log("playerCurrentScreen");
               console.log(playerCurrentScreen);
 
-              if (playerCurrentScreen !== "TowerDoorScreen" && playerCurrentScreen !== "Tower Screen") {
-                console.log("The player is not in the screen 'TowerDoorScreen' or inside the Tower, so he can not enter or exit the tower.");
-                return;
-              }
+              if (!isPlayerInsideTowerScreens(mqttClient)) return;
 
               // Generate a temporary access token
               const accessToken = crypto.randomUUID();
