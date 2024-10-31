@@ -58,14 +58,13 @@ async function toggleAcolyteInsideTower(email, io, mqttClient) {
   
       if (!email) throw new Error("Email parameter is null or undefined");
   
-      let playerCurrentScreen = await getPlayerScreen(email, io);
       let bodyText = '';
       let titleText = '';
   
       // Obtain the Mortimers data
       const mortimers = await findPlayersByRole("MORTIMER");
       console.log("Data from players with role MORTIMER: ");
-      console.log(mortimers);
+      // console.log(mortimers);
   
       // Obtain the fcm_token from the Mortimer players array to send the push notification
       const fcm_tokens = mortimers.map(mortimer => mortimer.fcm_token);
@@ -80,7 +79,8 @@ async function toggleAcolyteInsideTower(email, io, mqttClient) {
       // Send message to mortimer that an acolyte is trying to access
       sendPushNotification(messageWarningSomeoneIsTryingToEnterTheTower);
   
-      if (!isPlayerInsideTowerScreens(mqttClient)) return;
+      let isPlayerInsideTowerScreensBool = await isPlayerInsideTowerScreens(email, mqttClient, io); 
+      if (!isPlayerInsideTowerScreensBool) return;
   
       // Await the asynchronous operation to ensure it completes
       const newPlayerData = await toggleIsInsideTowerByEmail(email);
@@ -109,7 +109,13 @@ async function toggleAcolyteInsideTower(email, io, mqttClient) {
     }
 }
 
-function isPlayerInsideTowerScreens(mqttClient) {
+async function isPlayerInsideTowerScreens(email, mqttClient, io) {
+
+  console.log(" === Entered method isPlayerInsideTowerScreens ===");
+
+  const playerCurrentScreen = await getPlayerScreen(email, io);
+  console.log("playerCurrentScreen");
+  console.log(playerCurrentScreen);
 
   if (playerCurrentScreen !== "TowerDoorScreen" && playerCurrentScreen !== "Tower Screen") {
     console.log("The player is not in the screen 'TowerDoorScreen' or inside the Tower, so he can not enter or exit the tower.");
@@ -119,15 +125,15 @@ function isPlayerInsideTowerScreens(mqttClient) {
       if (err) {
         console.error("Failed to publish 'doorAction' topic:", err);
       } else {
-        console.log("Published 'open door' action to MQTT");
+        console.log("Published. TOPIC: ['doorAction'] PAYLOAD: { action: 'error' }");
       }
     });
 
     return false;
   } 
 
+  console.log('The player is inside "TowerDoorScreen" or "Tower Screen"');
   return true;
-
 }
 
 

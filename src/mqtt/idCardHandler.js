@@ -30,26 +30,26 @@ const  {createMessageForPushNotification} = require('../messages/messagePushNoti
           
           if (playerData ) {
 
-              const playerCurrentScreen = await getPlayerScreen(playerData.email, io);
-              console.log("playerCurrentScreen");
-              console.log(playerCurrentScreen);
+            let isPlayerInsideTowerScreensBool = await isPlayerInsideTowerScreens(playerData.email, mqttClient, io); 
+            if (!isPlayerInsideTowerScreensBool) return;
 
-              if (!isPlayerInsideTowerScreens(mqttClient)) return;
+            // Generate a temporary access token
+            const accessToken = crypto.randomUUID();
+            
+            // Store token and email association in MonogDB
+            await storeAccessToken(accessToken, playerData.email);
+            
+            console.log("Opening door");
+            
+            // Notify ESP32 that has to open.
+            mqttClient.publish('doorAction', JSON.stringify({ action: 'open', token: accessToken}), (err) => {
+              if (err) {
+                console.error("Failed to publish 'doorAction' topic:", err);
+              } else {
+                console.log("Published. TOPIC: ['doorAction'] PAYLOAD: { action: 'open', token: accessToken} ");
+              }
+            });
 
-              // Generate a temporary access token
-              const accessToken = crypto.randomUUID();
-              
-              // Store token and email association in MonogDB
-              await storeAccessToken(accessToken, playerData.email);
-
-              // Notify ESP32 that has to open.
-              mqttClient.publish('doorAction', JSON.stringify({ action: 'open', token: accessToken}), (err) => {
-                if (err) {
-                  console.error("Failed to publish 'doorAction' topic:", err);
-                } else {
-                  console.log("Published 'open door' action to MQTT");
-                }
-              });
           }  else {
             console.log(`Access denied for cardId: ${cardId}`);
           
@@ -57,7 +57,7 @@ const  {createMessageForPushNotification} = require('../messages/messagePushNoti
               if (err) {
                 console.error("Failed to publish 'doorAction' topic:", err);
               } else {
-                console.log("Published 'doorAction' action to MQTT");
+                console.log("Published. TOPIC: ['doorAction'] PAYLOAD: { action: 'error' }");
               }
             });
 
