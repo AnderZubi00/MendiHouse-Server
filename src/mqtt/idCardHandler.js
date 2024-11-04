@@ -1,6 +1,6 @@
 const { findPlayerByIdCard, findPlayersByRole } = require('../database/Player');
 const { storeAccessToken } = require('../database/Token');
-const { toggleAcolyteInsideTower, sendPushNotification, getPlayerScreen } = require('../utils/utils');
+const { toggleAcolyteInsideTower, sendPushNotification, getPlayerScreen, isPlayerInsideTowerScreens } = require('../utils/utils');
 const  {createMessageForPushNotification} = require('../messages/messagePushNotifications');
 
   function handleIdCardAccess(io, mqttClient) {
@@ -18,9 +18,8 @@ const  {createMessageForPushNotification} = require('../messages/messagePushNoti
     // Listen for messages on the subscribed topic
     mqttClient.on('message', async (receivedTopic, message) => {
       if (receivedTopic === topic) {
-        const cardIdMessage = JSON.parse(message.toString());
-        console.log(cardIdMessage);
-        const cardId = cardIdMessage.cardId;
+        console.log("mensaje puro: " + message);
+        const cardId = message;
         console.log(cardId);
 
         try {
@@ -31,29 +30,26 @@ const  {createMessageForPushNotification} = require('../messages/messagePushNoti
           
           if (playerData ) {
 
-              const playerCurrentScreen = await getPlayerScreen(playerData.email, io);
-              console.log("playerCurrentScreen");
-              console.log(playerCurrentScreen);
+            let isPlayerInsideTowerScreensBool = await isPlayerInsideTowerScreens(playerData.email, mqttClient, io); 
+            if (!isPlayerInsideTowerScreensBool) return;
 
-              if (playerCurrentScreen !== "TowerDoorScreen" && playerCurrentScreen !== "Tower Screen") {
-                console.log("The player is not in the screen 'TowerDoorScreen' or inside the Tower, so he can not enter or exit the tower.");
-                return;
+            // Generate a temporary access token
+            const accessToken = crypto.randomUUID();
+            
+            // Store token and email association in MonogDB
+            await storeAccessToken(accessToken, playerData.email);
+            
+            console.log("Opening door");
+            
+            // Notify ESP32 that has to open.
+            mqttClient.publish('doorAction', JSON.stringify({ action: 'open', token: accessToken}), (err) => {
+              if (err) {
+                console.error("Failed to publish 'doorAction' topic:", err);
+              } else {
+                console.log("Published. TOPIC: ['doorAction'] PAYLOAD: { action: 'open', token: accessToken} ");
               }
+            });
 
-              // Generate a temporary access token
-              const accessToken = crypto.randomUUID();
-              
-              // Store token and email association in MonogDB
-              await storeAccessToken(accessToken, playerData.email);
-
-              // Notify ESP32 that has to open.
-              mqttClient.publish('doorAction', JSON.stringify({ action: 'open', token: accessToken}), (err) => {
-                if (err) {
-                  console.error("Failed to publish 'doorAction' topic:", err);
-                } else {
-                  console.log("Published 'open door' action to MQTT");
-                }
-              });
           }  else {
             console.log(`Access denied for cardId: ${cardId}`);
           
@@ -61,7 +57,7 @@ const  {createMessageForPushNotification} = require('../messages/messagePushNoti
               if (err) {
                 console.error("Failed to publish 'doorAction' topic:", err);
               } else {
-                console.log("Published 'doorAction' action to MQTT");
+                console.log("Published. TOPIC: ['doorAction'] PAYLOAD: { action: 'error' }");
               }
             });
 
