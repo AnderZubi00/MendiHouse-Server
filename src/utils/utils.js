@@ -61,6 +61,7 @@ async function toggleAcolyteInsideTower(email, io) {
       let playerCurrentScreen = await getPlayerScreen(email, io);
       let bodyText = '';
       let titleText = '';
+      let messageTopic = '';
   
       // Obtain the Mortimers data
       const mortimers = await findPlayersByRole("MORTIMER");
@@ -69,16 +70,6 @@ async function toggleAcolyteInsideTower(email, io) {
   
       // Obtain the fcm_token from the Mortimer players array to send the push notification
       const fcm_tokens = mortimers.map(mortimer => mortimer.fcm_token);
-  
-      // Add the text to the message body and title, for the message we want to send on the push notification
-      bodyText = 'An acolyte is trying to open the door of The Tower.';
-      titleText = 'Something is moving on the tower door!!!';
-  
-      // Create the message object to modify to send it, with fcm_token to send the message to the correct device/user
-      const messageWarningSomeoneIsTryingToEnterTheTower = createMessageForPushNotification(bodyText, titleText, fcm_tokens);
-  
-      // Send message to mortimer that an acolyte is trying to access
-      sendPushNotification(messageWarningSomeoneIsTryingToEnterTheTower);
   
       if (playerCurrentScreen !== "TowerDoorScreen" && playerCurrentScreen !== "Tower Screen") {
         console.log("The player is not in the screen 'TowerDoorScreen' or inside the Tower, so he can not enter or exit the tower.");
@@ -98,9 +89,10 @@ async function toggleAcolyteInsideTower(email, io) {
       // Add the text to the message body and title, for the message we want to send on the push notification
       bodyText = 'An acolyte tried to open the door fo The Tower and success.';
       titleText = 'The tower door has been opened!!!';
+      messageTopic = 'SuccessOpeningDoor';
   
       // Create the message object to modify to send it, with fcm_token to send the message to the correct device/user
-      const messageWarningSomeoneSuccessOpeningTheTowerDoor = createMessageForPushNotification(bodyText, titleText, fcm_tokens);
+      const messageWarningSomeoneSuccessOpeningTheTowerDoor = createMessageForPushNotification(bodyText, titleText, fcm_tokens, messageTopic);
   
       console.log(messageWarningSomeoneSuccessOpeningTheTowerDoor);
   
