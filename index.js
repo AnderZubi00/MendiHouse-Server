@@ -44,8 +44,8 @@ const mqttOptions = {
   rejectUnauthorized: true
 };
 
-const mqttClient = mqtt.connect(process.env.MQTT_BROKER_URL, mqttOptions); // Para añadir los certificados a la conexion
-//const mqttClient = mqtt.connect(process.env.MQTT_BROKER_URL);
+// const mqttClient = mqtt.connect(process.env.MQTT_BROKER_URL, mqttOptions); // Para añadir los certificados a la conexion
+const mqttClient = mqtt.connect(process.env.MQTT_BROKER_URL);
 
 // ------------------------ //
 // -----   REST API   ----- //
