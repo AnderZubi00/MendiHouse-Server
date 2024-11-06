@@ -42,7 +42,7 @@ const  {createMessageForPushNotification} = require('../messages/messagePushNoti
             console.log("Opening door");
             
             // Notify ESP32 that has to open.
-            mqttClient.publish('doorAction', JSON.stringify({ action: 'open', token: accessToken}), (err) => {
+            mqttClient.publish('MendiHouse/doorAction', JSON.stringify({ action: 'open', token: accessToken}), (err) => {
               if (err) {
                 console.error("Failed to publish 'doorAction' topic:", err);
               } else {
@@ -53,7 +53,7 @@ const  {createMessageForPushNotification} = require('../messages/messagePushNoti
           }  else {
             console.log(`Access denied for cardId: ${cardId}`);
           
-            mqttClient.publish('doorAction', JSON.stringify({ action: 'error' }), (err) => {
+            mqttClient.publish('MendiHouse/doorAction', JSON.stringify({ action: 'error' }), (err) => {
               if (err) {
                 console.error("Failed to publish 'doorAction' topic:", err);
               } else {

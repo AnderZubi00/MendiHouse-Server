@@ -46,7 +46,7 @@ function handleDoorAccess(mqttClient, io) {
               await toggleAcolyteInsideTower(doorEmail, io, mqttClient);
 
               // Publish "close door" message to MQTT topic
-              mqttClient.publish('doorAction', JSON.stringify({ action: 'close' }), (err) => {
+              mqttClient.publish('MendiHouse/doorAction', JSON.stringify({ action: 'close' }), (err) => {
                 if (err) {
                   console.error("Failed to publish close door' action:", err);
                 } else {
