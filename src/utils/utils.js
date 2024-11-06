@@ -113,11 +113,11 @@ async function isPlayerInsideTowerScreens(email, mqttClient, io) {
     console.log("The player is not in the screen 'TowerDoorScreen' or inside the Tower, so he can not enter or exit the tower.");
 
     // Notify ESP32 that player can not enter the tower.
-    mqttClient.publish('doorAction', JSON.stringify({ action: 'error' }), (err) => {
+    mqttClient.publish('doorAction', JSON.stringify({ action: 'notInScreen' }), (err) => {
       if (err) {
         console.error("Failed to publish 'doorAction' topic:", err);
       } else {
-        console.log("Published. TOPIC: ['doorAction'] PAYLOAD: { action: 'error' }");
+        console.log("Published. TOPIC: ['doorAction'] PAYLOAD: { action: 'notInScreen' }");
       }
     });
 
