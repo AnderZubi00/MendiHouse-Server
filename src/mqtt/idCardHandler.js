@@ -5,7 +5,7 @@ const  {createMessageForPushNotification} = require('../messages/messagePushNoti
 
   function handleIdCardAccess(io, mqttClient) {
 
-    const topic = 'cardId';
+    const topic = 'MendiHouse/cardId';
 
     mqttClient.subscribe(topic, (err) => {
       if (err) {

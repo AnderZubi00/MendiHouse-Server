@@ -3,7 +3,7 @@ const { findEmailByAccessToken } = require('../database/Token');
 
 function handleDoorAccess(mqttClient, io) {
 
-    const topic = 'doorStatus';
+    const topic = 'MendiHouse/doorStatus';
 
     mqttClient.subscribe(topic, (err) => {
       if (err) {
