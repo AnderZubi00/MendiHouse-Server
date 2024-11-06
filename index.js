@@ -40,12 +40,10 @@ const mqttOptions = {
   clientId: 'MendiHouse-Node.js',
   key: fs.readFileSync('./certificates/server.key'),
   cert: fs.readFileSync('./certificates/server.crt'),
-  ca: fs.readFileSync('./certificates/ca.crt'),
-  rejectUnauthorized: true
+  ca: fs.readFileSync('./certificates/ca.crt')
 };
 
-// const mqttClient = mqtt.connect(process.env.MQTT_BROKER_URL, mqttOptions); // Para añadir los certificados a la conexion
-const mqttClient = mqtt.connect(process.env.MQTT_BROKER_URL);
+const mqttClient = mqtt.connect(process.env.MQTT_BROKER_URL, mqttOptions);
 
 // ------------------------ //
 // -----   REST API   ----- //
