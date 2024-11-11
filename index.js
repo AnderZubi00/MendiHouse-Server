@@ -43,7 +43,7 @@ const mqttOptions = {
   ca: fs.readFileSync('./certificates/ca.crt')
 };
 
-const mqttClient = mqtt.connect(process.env.MQTT_BROKER_URL, mqttOptions);
+// const mqttClient = mqtt.connect(process.env.MQTT_BROKER_URL, mqttOptions);
 
 // ------------------------ //
 // -----   REST API   ----- //
@@ -136,12 +136,12 @@ io.on("connection", (socket) => {
 // -----   MQTT   ------ //
 // --------------------- //
 
-///Susbcrbe to topic 'idCard' and handle all the logic 
-idCardHandler.handleIdCardAccess(io, mqttClient);
+// ///Susbcrbe to topic 'idCard' and handle all the logic 
+// idCardHandler.handleIdCardAccess(io, mqttClient);
 
 
-///Subscribe to topic 'doorStatus' and handle all the logic 
-doorStatusHandler.handleDoorAccess(mqttClient, io);
+// ///Subscribe to topic 'doorStatus' and handle all the logic 
+// doorStatusHandler.handleDoorAccess(mqttClient, io);
 
 //////////////////
 
