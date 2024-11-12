@@ -50,6 +50,7 @@ const createPlayer = async (playerData) => {
         playerData.socketId = null;
         playerData.isInsideLab = false;
         playerData.isInsideTower = false;
+        playerData.isInsideHall = false;
         playerData.cardId = null;
 
         const newPlayer = await Player.createPlayer(playerData);
