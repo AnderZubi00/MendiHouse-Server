@@ -52,6 +52,7 @@ const mqttOptions = {
 //Import routes
 const authRoutes = require('./src/routes/authRoutes');
 const playerRouter = require("./src/routes/playerRoutes");
+const artefactsRoutes = require('./src/routes/ArtefactRoutes'); 
 
 // Middleware to parse JSON
 app.use(express.json());
@@ -59,7 +60,7 @@ app.use(express.json());
 // Route API
 app.use('/api/token', authRoutes);
 app.use("/api/players", playerRouter);
-
+app.use("/api/artefacts", artefactsRoutes);
 // Start the server
 const PORT = process.env.PORT || 3000;
 
