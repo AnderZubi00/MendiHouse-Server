@@ -75,6 +75,7 @@ io.on("connection", (socket) => {
   // Return the socket Id  to the client using a socket
   io.to(socket.id).emit("connection", { socketId: socket.id });
 
+  ////////////////////////////////////////////////////////////////////////////////////////
   // Add to listen to the function to update the socket Id of the client
   socket.on("updateSocketId", (emailSocketId) => {
 
@@ -92,6 +93,7 @@ io.on("connection", (socket) => {
 
   });
 
+  //////////////////////////////////////////////////////////////////////////////////////////
   socket.on("acolyteScanned", async (data) => {
 
     try {
@@ -129,6 +131,20 @@ io.on("connection", (socket) => {
     }
 
   });
+
+
+  ///////////////////////////////////////////////////////////////////////////////////////////////
+  // Listen for position updates from acolytes
+  socket.on('updatePosition', (data) => {
+    console.log('Player position updated:', data);
+
+    // Broadcast the updated position to all roles
+    io.emit('playerLocationUpdate', data);
+  });
+
+  // socket.on('disconnect', () => {
+  //   console.log('user disconnected');
+  // });
 
 });
 
