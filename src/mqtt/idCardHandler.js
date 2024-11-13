@@ -68,9 +68,10 @@ const  {createMessageForPushNotification} = require('../messages/messagePushNoti
             // Obtain the fcm_token from the Mortimer players array to send the push notification
             const mortimers = await findPlayersByRole("MORTIMER");
             const fcm_tokens = mortimers.map(mortimer => mortimer.fcm_token);
+            const unique_fcm_tokens = [...new Set(fcm_tokens)];
 
             // Create the message object to modify to send it, with fcm_token to send the message to the correct device/user
-            const messageDeniedAccess = createMessageForPushNotification(bodyText, titleText, fcm_tokens);
+            const messageDeniedAccess = createMessageForPushNotification(bodyText, titleText, unique_fcm_tokens);
             sendPushNotification(messageDeniedAccess);
           }
         } catch (error) {
