@@ -135,7 +135,9 @@ function sendPushNotification(message) {
       .messaging()
       .sendEachForMulticast(message)
       .then(response => {
-        console.log('Successfully sent message:', response);
+        console.log('Successfully sent message:');
+        console.log('Success count:', response.successCount);
+        console.log('Failure count:', response.failureCount);
       })
       .catch(error => {
         console.log('Error sending message:', error);
