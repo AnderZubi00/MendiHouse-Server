@@ -226,6 +226,11 @@ const findPlayersByRole = async (role) => {
       return null;
     }
 
+    console.log(`Players found with '${role}' role:`);
+    players.map(player => {
+      console.log(` - ${player.email}`);
+    });
+
     return players;
 
   } catch (error) {

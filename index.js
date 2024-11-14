@@ -9,7 +9,7 @@ const idCardHandler = require('./src/mqtt/idCardHandler');
 const doorStatusHandler = require('./src/mqtt/doorStatusHandler');
 
 const { updatePlayerByEmail, getAllAcolytes, toggleIsInsideLabByEmail, toggleIsInsideTowerByEmail, findPlayerByEmail, findPlayersByRole, toggleIsInsideHallBySocketId } = require('./src/database/Player');
-
+const { toggleCollectedWithArtefactId } = require('./src/database/Artefact');
 
 
 // ------------------------------------- //
@@ -184,13 +184,34 @@ io.on("connection", (socket) => {
     // Broadcast the updated position to all other clients, except the sender
     socket.broadcast.emit('playerLocationUpdate', data);
 
-    // socket.on('disconnect', () => {
-    //   console.log('user disconnected');
-    // });
+  // socket.on('disconnect', () => {
+  //   console.log('user disconnected');
+  // });
+  });
 
+
+  ///////////////////////////////////////////////////////////////////////////
+  socket.on('collectArtefact', async ({ artefactId, collected }) => {
+    console.log(`Artefact ID: ${artefactId}, Collect: ${collected}`);
+   
+     try {
+        const updatedArtefact = await toggleCollectedWithArtefactId(artefactId, collected);
+
+        io.emit('updatedArtefact', {
+          artefactId: updatedArtefact._id, 
+          collected: updatedArtefact.collected,
+        });
+
+        console.log(`Artefact ${artefactId} updated collected: ${collected}`);
+    } catch (error) {
+        console.error(`Error updating the artefact ${artefactId}:`, error);
+    }
   });
 
 });
+
+
+
 // --------------------- //
 // -----   MQTT   ------ //
 // --------------------- //
