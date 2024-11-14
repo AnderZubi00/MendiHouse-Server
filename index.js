@@ -151,6 +151,37 @@ io.on("connection", (socket) => {
   // });
   });
 
+  ////////////
+
+  // Listen for a new user entering the map and requesting other players' positions
+  socket.on("requestOtherPositions", () => {
+    console.log("Request for other players' positions received from:", socket.id);
+
+    // Notify all other players to send their position to the server
+    // 'orderSendThePosition' is sent to all clients except the requester
+    socket.broadcast.emit("orderSendThePosition", { requesterId: socket.id });
+  });
+
+  // Listen for positions sent by other clients who are already in the map
+  socket.on("sendPositions", (data) => {
+    const { coordinates, email, avatar, nickname, requesterId } = data;
+
+    console.log(`Position received from ${email}:`, coordinates);
+
+    // Send the position back only to the requesting socket
+    io.to(requesterId).emit("receiveOtherLocation", {
+      email,
+      coordinates,
+      avatar,
+      nickname,
+    });
+  });
+
+  // // Clean up on disconnect (optional)
+  // socket.on("disconnect", () => {
+  //   console.log("User disconnected:", socket.id);
+  // });
+
 
   ///////////////////////////////////////////////////////////////////////////
   socket.on('collectArtefact', async ({ artefactId, collected }) => {
