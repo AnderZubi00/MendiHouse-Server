@@ -134,39 +134,20 @@ io.on("connection", (socket) => {
   });
 
   //////////////////////////////////////////////////////////////////////////////////////////
-  // Refresh 'Ancient Hall Of Sages' inside list
+  // Refresh 'Ancient Hall Of Sages' Screen inside Acolytes
   socket.on("refreshAncientHallOfSagesListForPlayers", async () => {
 
     try {
 
       console.log("\n========= Player Has Enter/Exit 'Ancient Hall of Sages' =========");
-
-      // // Await the asynchronous operation to ensure it completes
-      // const newPlayerData = await toggleIsInsideLabByEmail(acolyteEmail);
-
-      console.log();
-      
-      // Notify clients to refresh 'Ancient Hall Of Sages' list
-      const acolyteList = await getAllAcolytes();
-      // // Obtain the Mortimers data
-      // const mortimers = await findPlayersByRole("MORTIMER");
-
-      // console.log(mortimers);
-      // console.log(acolyteList);
-      
-      // const playerList = [];
-      // playerList.push(mortimers);
-      // playerList.push(acolyteList);
-
       await toggleIsInsideHallBySocketId(socket.id);
-      console.log("Linea 160");
-      
+      // Get athe Acolyte List
+      const acolyteList = await getAllAcolytes();
+      // Notify clients to refresh 'Ancient Hall Of Sages' list
       io.emit("refreshAncientHallOfSagesList", acolyteList);
 
     } catch (error) {
-
       console.log('Error in method refresh Ancient hall of sages. Error: ', error);
-
     }
 
   });
@@ -184,27 +165,25 @@ io.on("connection", (socket) => {
     // Broadcast the updated position to all other clients, except the sender
     socket.broadcast.emit('playerLocationUpdate', data);
 
-  // socket.on('disconnect', () => {
-  //   console.log('user disconnected');
-  // });
+    // socket.on('disconnect', () => {
+    //   console.log('user disconnected');
+    // });
   });
 
 
   ///////////////////////////////////////////////////////////////////////////
   socket.on('collectArtefact', async ({ artefactId, collected }) => {
     console.log(`Artefact ID: ${artefactId}, Collect: ${collected}`);
-   
-     try {
-        const updatedArtefact = await toggleCollectedWithArtefactId(artefactId, collected);
 
-        io.emit('updatedArtefact', {
-          artefactId: updatedArtefact._id, 
-          collected: updatedArtefact.collected,
-        });
-
-        console.log(`Artefact ${artefactId} updated collected: ${collected}`);
+    try {
+      const updatedArtefact = await toggleCollectedWithArtefactId(artefactId, collected);
+      io.emit('updatedArtefact', {
+        artefactId: updatedArtefact._id,
+        collected: updatedArtefact.collected,
+      });
+      console.log(`Artefact ${artefactId} updated collected: ${collected}`);
     } catch (error) {
-        console.error(`Error updating the artefact ${artefactId}:`, error);
+      console.error(`Error updating the artefact ${artefactId}:`, error);
     }
   });
 
