@@ -177,6 +177,16 @@ io.on("connection", (socket) => {
     });
   });
 
+  //////////
+
+  // Listen for when a player leaves
+  socket.on("playerLeft", ({ email }) => {
+    console.log(`Player with email ${email} has left`);
+
+    // Broadcast to all clients to remove this player
+    socket.broadcast.emit("removePlayer", { email });
+  });
+
   // // Clean up on disconnect (optional)
   // socket.on("disconnect", () => {
   //   console.log("User disconnected:", socket.id);
