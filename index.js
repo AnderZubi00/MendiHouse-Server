@@ -139,9 +139,12 @@ io.on("connection", (socket) => {
   socket.on('updatePosition', (data) => {
     console.log('Player position updated:', data);
 
-    // Broadcast the updated position to all roles
-    io.emit('playerLocationUpdate', data);
-  });
+  //   // Broadcast the updated position to all roles
+  //   io.emit('playerLocationUpdate', data);
+  // });
+
+   // Broadcast the updated position to all other clients, except the sender
+   socket.broadcast.emit('playerLocationUpdate', data);
 
   // socket.on('disconnect', () => {
   //   console.log('user disconnected');
