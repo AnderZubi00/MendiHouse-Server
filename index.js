@@ -8,7 +8,7 @@ const fs = require('fs');
 const idCardHandler = require('./src/mqtt/idCardHandler');
 const doorStatusHandler = require('./src/mqtt/doorStatusHandler');
 
-const { updatePlayerByEmail, getAllAcolytes, toggleIsInsideLabByEmail, toggleIsInsideTowerByEmail, findPlayerByEmail } = require('./src/database/Player');
+const { updatePlayerByEmail, getAllAcolytes, toggleIsInsideLabByEmail, toggleIsInsideTowerByEmail, findPlayerByEmail, findPlayersByRole, toggleIsInsideHallBySocketId } = require('./src/database/Player');
 
 
 
@@ -52,7 +52,7 @@ const mqttOptions = {
 //Import routes
 const authRoutes = require('./src/routes/authRoutes');
 const playerRouter = require("./src/routes/playerRoutes");
-const artefactsRoutes = require('./src/routes/ArtefactRoutes'); 
+const artefactsRoutes = require('./src/routes/ArtefactRoutes');
 
 // Middleware to parse JSON
 app.use(express.json());
@@ -133,25 +133,64 @@ io.on("connection", (socket) => {
 
   });
 
+  //////////////////////////////////////////////////////////////////////////////////////////
+  // Refresh 'Ancient Hall Of Sages' inside list
+  socket.on("refreshAncientHallOfSagesListForPlayers", async () => {
+
+    try {
+
+      console.log("\n========= Player Has Enter/Exit 'Ancient Hall of Sages' =========");
+
+      // // Await the asynchronous operation to ensure it completes
+      // const newPlayerData = await toggleIsInsideLabByEmail(acolyteEmail);
+
+      console.log();
+      
+      // Notify clients to refresh 'Ancient Hall Of Sages' list
+      const acolyteList = await getAllAcolytes();
+      // // Obtain the Mortimers data
+      // const mortimers = await findPlayersByRole("MORTIMER");
+
+      // console.log(mortimers);
+      // console.log(acolyteList);
+      
+      // const playerList = [];
+      // playerList.push(mortimers);
+      // playerList.push(acolyteList);
+
+      await toggleIsInsideHallBySocketId(socket.id);
+      console.log("Linea 160");
+      
+      io.emit("refreshAncientHallOfSagesList", acolyteList);
+
+    } catch (error) {
+
+      console.log('Error in method refresh Ancient hall of sages. Error: ', error);
+
+    }
+
+  });
+
 
   ///////////////////////////////////////////////////////////////////////////////////////////////
   // Listen for position updates from acolytes
   socket.on('updatePosition', (data) => {
     console.log('Player position updated:', data);
 
-  //   // Broadcast the updated position to all roles
-  //   io.emit('playerLocationUpdate', data);
-  // });
+    //   // Broadcast the updated position to all roles
+    //   io.emit('playerLocationUpdate', data);
+    // });
 
-   // Broadcast the updated position to all other clients, except the sender
-   socket.broadcast.emit('playerLocationUpdate', data);
+    // Broadcast the updated position to all other clients, except the sender
+    socket.broadcast.emit('playerLocationUpdate', data);
 
-  // socket.on('disconnect', () => {
-  //   console.log('user disconnected');
-  // });
+    // socket.on('disconnect', () => {
+    //   console.log('user disconnected');
+    // });
+
+  });
 
 });
-
 // --------------------- //
 // -----   MQTT   ------ //
 // --------------------- //
@@ -197,4 +236,3 @@ start();
 
 
 // getPlayerScreen(email, io);
-
