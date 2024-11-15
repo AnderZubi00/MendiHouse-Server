@@ -183,7 +183,7 @@ io.on("connection", (socket) => {
 
   // Listen for positions sent by other clients who are already in the map
   socket.on("sendPositions", (data) => {
-    const { coordinates, email, avatar, nickname, requesterId } = data;
+    const { coordinates, email, avatar, nickname, role, requesterId } = data;
 
     console.log(`Position received from ${email}:`, coordinates);
 
@@ -193,6 +193,7 @@ io.on("connection", (socket) => {
       coordinates,
       avatar,
       nickname,
+      role,
     });
   });
 
