@@ -1,7 +1,7 @@
 const admin = require('firebase-admin')
 // Import function to create the message object for the push notifications
 const  {createMessageForPushNotification} = require('../messages/messagePushNotifications');
-const { findPlayersByRole, toggleIsInsideTowerByEmail, findPlayerByEmail } = require('../database/Player');
+const { findPlayersByRole, toggleIsInsideTowerByEmail, findPlayerByEmail, getAllAcolytes } = require('../database/Player');
 
 async function getPlayerScreen(email, io) {
 
@@ -144,9 +144,29 @@ function sendPushNotification(message) {
       });
   }
 
+
+async function getPlayersToUpdateTheAncientHallOfSagesInsidePlayers() {
+  // Get the Acolyte List
+  const acolyteList = await getAllAcolytes();
+  // Get the Mortimer List
+  const mortimersList = await findPlayersByRole('MORTIMER');
+  // Get the Villain List
+  const villainsList = await findPlayersByRole('VILLAIN');
+
+  // The array to return with all the players that can enter on the hall of sages
+  let playersList = [];
+  playersList = playersList.concat(acolyteList);
+  playersList = playersList.concat(mortimersList);
+  playersList = playersList.concat(villainsList);
+
+  return playersList;
+}
+
+
   module.exports = {
     toggleAcolyteInsideTower,
     sendPushNotification,
     getPlayerScreen,
-    isPlayerInsideTowerScreens
+    isPlayerInsideTowerScreens, 
+    getPlayersToUpdateTheAncientHallOfSagesInsidePlayers,
   }

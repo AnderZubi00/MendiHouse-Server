@@ -53,6 +53,7 @@ const mqttOptions = {
 const authRoutes = require('./src/routes/authRoutes');
 const playerRouter = require("./src/routes/playerRoutes");
 const artefactsRoutes = require('./src/routes/ArtefactRoutes');
+const { getPlayersToUpdateTheAncientHallOfSagesInsidePlayers } = require('./src/utils/utils');
 
 // Middleware to parse JSON
 app.use(express.json());
@@ -141,18 +142,9 @@ io.on("connection", (socket) => {
 
       console.log("\n========= Player Has Enter/Exit 'Ancient Hall of Sages' =========");
       await toggleIsInsideHallBySocketId(socket.id);
-      // Get the Acolyte List
-      const acolyteList = await getAllAcolytes();
-      // Get the Mortimer List
-      const mortimersList = await findPlayersByRole('MORTIMER');
-      // Get the Villain List
-      const villainsList = await findPlayersByRole('VILLAIN');
-
-      // The array to return with all the players that can enter on the hall of sages
-      let playersList = [];
-      playersList = playersList.concat(acolyteList);
-      playersList = playersList.concat(mortimersList);
-      playersList = playersList.concat(villainsList);
+      
+      // Get the players data to update the the 'Ancient Hall of Sages'
+      const playersList = await getPlayersToUpdateTheAncientHallOfSagesInsidePlayers();
       
       // Notify clients to refresh 'Ancient Hall Of Sages' list
       io.emit("refreshAncientHallOfSagesList", playersList);
