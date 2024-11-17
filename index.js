@@ -141,10 +141,21 @@ io.on("connection", (socket) => {
 
       console.log("\n========= Player Has Enter/Exit 'Ancient Hall of Sages' =========");
       await toggleIsInsideHallBySocketId(socket.id);
-      // Get athe Acolyte List
+      // Get the Acolyte List
       const acolyteList = await getAllAcolytes();
+      // Get the Mortimer List
+      const mortimersList = await findPlayersByRole('MORTIMER');
+      // Get the Villain List
+      const villainsList = await findPlayersByRole('VILLAIN');
+
+      // The array to return with all the players that can enter on the hall of sages
+      let playersList = [];
+      playersList = playersList.concat(acolyteList);
+      playersList = playersList.concat(mortimersList);
+      playersList = playersList.concat(villainsList);
+      
       // Notify clients to refresh 'Ancient Hall Of Sages' list
-      io.emit("refreshAncientHallOfSagesList", acolyteList);
+      io.emit("refreshAncientHallOfSagesList", playersList);
 
     } catch (error) {
       console.log('Error in method refresh Ancient hall of sages. Error: ', error);
