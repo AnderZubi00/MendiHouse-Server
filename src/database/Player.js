@@ -137,11 +137,11 @@ const toggleIsInsideTowerByEmail = async (emailFilter) => {
     }
 };
 
-const updateIsInsideHallByEmail = async (emailFilter, newIsInsideHall) => {
+const updateIsInsideHallByEmail = async (email, newIsInsideHall) => {
     
   try {
     const updatedPlayer = await Player.findOneAndUpdate(
-      { email: emailFilter }, // Filter to find the player by email
+      { email: email }, // Filter to find the player by email
       [
         {
           $set: {
@@ -162,7 +162,7 @@ const updateIsInsideHallByEmail = async (emailFilter, newIsInsideHall) => {
     return updatedPlayer;
 
   } catch (error) {
-    console.log(`Error toggling isInsideHall for player with socketId ${socketIdFilter}:`, error);
+    console.log(`Error toggling isInsideHall for player with email ${newIsInsideHall}:`, error);
     throw error;
   }
 };

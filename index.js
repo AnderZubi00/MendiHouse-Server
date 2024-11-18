@@ -140,10 +140,10 @@ io.on("connection", (socket) => {
 
     try {
 
-      if (data?.email && data?.isInsideHall) {
+      if (data?.email && data?.isInsideHall != undefined) {
         
         const {email, isInsideHall} = data;
-        
+
         console.log("\n========= Player Has Enter/Exit 'Ancient Hall of Sages' =========");
         await updateIsInsideHallByEmail(email, isInsideHall);
         
