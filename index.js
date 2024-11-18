@@ -225,6 +225,7 @@ io.on("connection", (socket) => {
       io.emit('updatedArtefact', {
         artefactId: updatedArtefact._id,
         collected: updatedArtefact.collected,
+        artefactName: updatedArtefact.name,
       });
       console.log(`Artefact ${artefactId} updated collected: ${collected}`);
     } catch (error) {
