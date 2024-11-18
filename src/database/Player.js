@@ -137,16 +137,15 @@ const toggleIsInsideTowerByEmail = async (emailFilter) => {
     }
 };
 
-const toggleIsInsideHallBySocketId = async (socketIdFilter) => {
+const updateIsInsideHallByEmail = async (emailFilter, newIsInsideHall) => {
     
   try {
-
     const updatedPlayer = await Player.findOneAndUpdate(
-      { socketId: socketIdFilter }, // Filter to find the player by email
+      { email: emailFilter }, // Filter to find the player by email
       [
         {
           $set: {
-            isInsideHall: { $not: '$isInsideHall' } // Toggle the value of isInsideTower
+            isInsideHall: newIsInsideHall
           }
         }
       ],
@@ -155,10 +154,10 @@ const toggleIsInsideHallBySocketId = async (socketIdFilter) => {
 
     // Handle the case where the player is not found
     if (!updatedPlayer) {
-      throw new Error(`Player with socketId ${socketIdFilter} not found.`);
+      throw new Error(`Player with email ${email} not found.`);
     }
 
-    console.log(`Player with socketId ${socketIdFilter} has toggled isInsideHall successfully`);
+    console.log(`${email}'s isInsideHall attribute has been set to ${newIsInsideHall ? 'true' : 'false'}`);
 
     return updatedPlayer;
 
@@ -248,7 +247,7 @@ module.exports = {
     findPlayerByEmail,
     toggleIsInsideLabByEmail,
     toggleIsInsideTowerByEmail,
-    toggleIsInsideHallBySocketId,
+    updateIsInsideHallByEmail,
     findPlayerByIdCard,
     findPlayersByRole
 }

@@ -8,7 +8,7 @@ const fs = require('fs');
 const idCardHandler = require('./src/mqtt/idCardHandler');
 const doorStatusHandler = require('./src/mqtt/doorStatusHandler');
 
-const { updatePlayerByEmail, getAllAcolytes, toggleIsInsideLabByEmail, toggleIsInsideTowerByEmail, findPlayerByEmail, findPlayersByRole, toggleIsInsideHallBySocketId } = require('./src/database/Player');
+const { updatePlayerByEmail, getAllAcolytes, toggleIsInsideLabByEmail, toggleIsInsideTowerByEmail, findPlayerByEmail, findPlayersByRole, updateIsInsideHallByEmail } = require('./src/database/Player');
 const { toggleCollectedWithArtefactId } = require('./src/database/Artefact');
 
 
@@ -136,19 +136,24 @@ io.on("connection", (socket) => {
 
   //////////////////////////////////////////////////////////////////////////////////////////
   // Refresh 'Ancient Hall Of Sages' Screen inside Acolytes
-  socket.on("refreshAncientHallOfSagesListForPlayers", async () => {
+  socket.on("refreshAncientHallOfSagesListForPlayers", async (data) => {
 
     try {
 
-      console.log("\n========= Player Has Enter/Exit 'Ancient Hall of Sages' =========");
-      await toggleIsInsideHallBySocketId(socket.id);
-      
-      // Get the players data to update the the 'Ancient Hall of Sages'
-      const playersList = await getPlayersToUpdateTheAncientHallOfSagesInsidePlayers();
-      
-      // Notify clients to refresh 'Ancient Hall Of Sages' list
-      io.emit("refreshAncientHallOfSagesList", playersList);
-
+      if (data?.email && data?.isInsideHall) {
+        
+        const {email, isInsideHall} = data;
+        
+        console.log("\n========= Player Has Enter/Exit 'Ancient Hall of Sages' =========");
+        await updateIsInsideHallByEmail(email, isInsideHall);
+        
+        // Get the players data to update the the 'Ancient Hall of Sages'
+        const playersList = await getPlayersToUpdateTheAncientHallOfSagesInsidePlayers();
+        
+        // Notify clients to refresh 'Ancient Hall Of Sages' list
+        io.emit("refreshAncientHallOfSagesList", playersList);
+        
+      }
     } catch (error) {
       console.log('Error in method refresh Ancient hall of sages. Error: ', error);
     }
