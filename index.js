@@ -264,7 +264,7 @@ io.on("connection", (socket) => {
   /////////////////////////////////////////////////////////////////////////////////
   socket.on("showArtefactsToMortimer", () => {
 
-    socket.emit("pressedShowArtefacts");
+    io.emit("pressedShowArtefacts");
   });
 
 });
