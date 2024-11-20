@@ -51,6 +51,7 @@ const createPlayer = async (playerData) => {
         playerData.isInsideLab = false;
         playerData.isInsideTower = false;
         playerData.isInsideHall = false;
+        playerData.obituaryDiscovered = false;
         playerData.cardId = null;
 
         const newPlayer = await Player.createPlayer(playerData);

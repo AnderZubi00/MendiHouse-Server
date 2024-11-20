@@ -249,11 +249,38 @@ io.on("connection", (socket) => {
     }
   });
 
+  ///////////////////////////////////////////////////////////////////////////////
+  socket.on("checkFourArtefactsCollected", async () => {
+    try {
+        // Check if all artefacts are collected using the service
+        const collectedArtefacts = await artefactService.checkAllCollected();
+  
+        if (collectedArtefacts) {
+          // Notify all connected clients about the artefact status
+          io.emit("updateHallOfSages", { message: "The secrets of the Hall have been unlocked!" });
+          socket.emit("fourArtefactsStatus", { status: true, message: "All artefacts collected!", artefacts: collectedArtefacts });
+      } else {
+          // Notify the requesting client about the status
+          socket.emit("fourArtefactsStatus", { status: false, message: "Not all artefacts are collected yet.", artefacts: null });
+      }
+  } catch (error) {
+      console.error("Error checking artefacts collection:", error);
+      // Notify the client about the error
+      socket.emit("fourArtefactsStatus", { status: false, message: "Error occurred while checking artefacts.", artefacts: null });
+  }
+  });
+
+
+  /////////////////////////////////////////////////////////////////////////////////
+  socket.on("showArtefactsToMortimer", () => {
+
+    io.emit("pressedShowArtefacts");
+  });
 
 });
 
+///////////////////////////////////////////////////////////////////////////////
 
-/////////////////////////////////////////////////////////////////////////////////
 
 
 
