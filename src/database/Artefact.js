@@ -32,7 +32,18 @@ const toggleCollectedWithArtefactId = async (artefactId, collected) => {
     }
 };
 
+const resetAllCollected = async () => {
+    try {
+        const result = await Artefact.updateMany({}, { collected: false });
+        return result;
+    } catch (error) {
+        console.error("Error al restablecer el estado de 'collected' para todos los artefactos:", error);
+        throw error;
+    }
+};
+
 module.exports = {
     getArtefacts,
-    toggleCollectedWithArtefactId
+    toggleCollectedWithArtefactId,
+    resetAllCollected
 }
