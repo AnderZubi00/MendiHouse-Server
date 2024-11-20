@@ -8,7 +8,7 @@ const fs = require('fs');
 const idCardHandler = require('./src/mqtt/idCardHandler');
 const doorStatusHandler = require('./src/mqtt/doorStatusHandler');
 
-const { updatePlayerByEmail, getAllAcolytes, toggleIsInsideLabByEmail, toggleIsInsideTowerByEmail, findPlayerByEmail, findPlayersByRole, updateIsInsideHallByEmail, resetObituaryDiscovered } = require('./src/database/Player');
+const { updatePlayerByEmail, getAllAcolytes, toggleIsInsideLabByEmail, toggleIsInsideTowerByEmail, findPlayerByEmail, findPlayersByRole, updateIsInsideHallByEmail, discoverObituary} = require('./src/database/Player');
 const { toggleCollectedWithArtefactId, getArtefacts, resetAllCollected } = require('./src/database/Artefact');
 const artefactService = require('./src/services/artefactService');
 const { getPlayersInsideHall } = require('./src/utils/utils');
@@ -309,21 +309,33 @@ io.on("connection", (socket) => {
 
   ///////////////////////////////////////////////////////////////////////////////
 
-  socket.on("statusValidateArtifacts", async ({ validated }) => {
+  socket.on("statusValidateArtifacts", async ({ validated, email }) => {
 
+    console.log(" ========== statusValidateArtifacts ==========")
+    let newPlayerData;
+    
     if (!validated) {
       try {
+        console.log("Mortimer has rejected the artifacts");
         const rejectArtefacts = await resetAllCollected();
       } catch (error) {
         console.error(`Error rejecting artifacts:`, error);
       }
     } else {
       try {
-        const obituaryDiscovered = await resetObituaryDiscovered();
+        console.log("Mortimer has accepted the artifacts");
+        const obituaryDiscovered = await discoverObituary();
+        newPlayerData = await findPlayerByEmail(email);
       } catch (error) {
         console.error(`Error rejecting obituaryDiscovered reset:`, error);
       }
     }
+
+    io.emit("mortimerValidation", {
+      validated: validated,
+      newPlayer: newPlayerData,
+    });
+
   });
 
 });

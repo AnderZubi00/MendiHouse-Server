@@ -238,7 +238,7 @@ const findPlayersByRole = async (role) => {
   }
 };
 
-const resetObituaryDiscovered = async () => {
+const discoverObituary = async () => {
   try {
       const result = await Player.updateMany({}, { obituaryDiscovered: true });
       return result;
@@ -260,5 +260,5 @@ module.exports = {
     updateIsInsideHallByEmail,
     findPlayerByIdCard,
     findPlayersByRole,
-    resetObituaryDiscovered
+    discoverObituary
 }
