@@ -8,7 +8,7 @@ const fs = require('fs');
 const idCardHandler = require('./src/mqtt/idCardHandler');
 const doorStatusHandler = require('./src/mqtt/doorStatusHandler');
 
-const { updatePlayerByEmail, getAllAcolytes, toggleIsInsideLabByEmail, toggleIsInsideTowerByEmail, findPlayerByEmail, findPlayersByRole, updateIsInsideHallByEmail } = require('./src/database/Player');
+const { updatePlayerByEmail, getAllAcolytes, toggleIsInsideLabByEmail, toggleIsInsideTowerByEmail, findPlayerByEmail, findPlayersByRole, updateIsInsideHallByEmail, resetObituaryDiscovered } = require('./src/database/Player');
 const { toggleCollectedWithArtefactId, getArtefacts, resetAllCollected } = require('./src/database/Artefact');
 const artefactService = require('./src/services/artefactService');
 const { getPlayersInsideHall } = require('./src/utils/utils');
@@ -318,7 +318,11 @@ io.on("connection", (socket) => {
         console.error(`Error rejecting artifacts:`, error);
       }
     } else {
-      //console.log("Artifacts validated");
+      try {
+        const obituaryDiscovered = await resetObituaryDiscovered();
+      } catch (error) {
+        console.error(`Error rejecting obituaryDiscovered reset:`, error);
+      }
     }
   });
 

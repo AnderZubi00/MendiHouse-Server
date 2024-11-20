@@ -238,6 +238,16 @@ const findPlayersByRole = async (role) => {
   }
 };
 
+const resetObituaryDiscovered = async () => {
+  try {
+      const result = await Player.updateMany({}, { obituaryDiscovered: true });
+      return result;
+  } catch (error) {
+      console.error("Error resetting obituaryDiscovered status for all players:", error);
+      throw error;
+  }
+};
+
 
 module.exports = {
     getAllPlayers,
@@ -249,5 +259,6 @@ module.exports = {
     toggleIsInsideTowerByEmail,
     updateIsInsideHallByEmail,
     findPlayerByIdCard,
-    findPlayersByRole
+    findPlayersByRole,
+    resetObituaryDiscovered
 }
