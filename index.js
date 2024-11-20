@@ -293,9 +293,9 @@ io.on("connection", (socket) => {
       const fcm_tokens = mortimer.fcm_token;
 
       // Add the text to the message body and title, for the message we want to send on the push notification
-      bodyText = 'The acolytes are requesting you in the Ancient Hall of Sage.';
-      titleText = 'Acolytes calling you';
-      messageTopic = 'NotifyMortimerEnterHall';
+      let bodyText = 'The acolytes are requesting you in the Ancient Hall of Sage.';
+      let titleText = 'Acolytes calling you';
+      let messageTopic = 'NotifyMortimerEnterHall';
   
       // Create the message object to modify to send it, with fcm_token to send the message to the correct device/user
       const messageRequestMortimerInHall = createMessageForPushNotification(bodyText, titleText, fcm_tokens, messageTopic);
