@@ -277,6 +277,35 @@ io.on("connection", (socket) => {
     io.emit("pressedShowArtefacts");
   });
 
+  ///////////////////////////////////////////////////////////////////////////////
+  socket.on("notifyMortimer", async () => {
+
+      ///find mortimer in players collecton 
+      // Obtain the Mortimers data
+      const mortimer = await findPlayersByRole("MORTIMER");
+      console.log("Data from players with role MORTIMER: ");
+      console.log(mortimer);
+
+      // Obtain the fcm_token from the Mortimer players array to send the push notification
+      const fcm_tokens = mortimer.fcm_token;
+
+      // Add the text to the message body and title, for the message we want to send on the push notification
+      bodyText = 'The acolytes are requesting you in the Ancient Hall of Sage.';
+      titleText = 'Acolytes calling you';
+      messageTopic = 'NotifyMortimerEnterHall';
+  
+      // Create the message object to modify to send it, with fcm_token to send the message to the correct device/user
+      const messageRequestMortimerInHall = createMessageForPushNotification(bodyText, titleText, fcm_tokens, messageTopic);
+  
+      console.log(messageRequestMortimerInHall);
+  
+      // Send message to mortimer that an acolyte failed to open the door
+      sendPushNotification(messageRequestMortimerInHall);
+
+  })
+
+  ///////////////////////////////////////////////////////////////////////////////
+
 });
 
 ///////////////////////////////////////////////////////////////////////////////
