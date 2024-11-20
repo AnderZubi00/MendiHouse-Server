@@ -11,7 +11,7 @@ const doorStatusHandler = require('./src/mqtt/doorStatusHandler');
 const { updatePlayerByEmail, getAllAcolytes, toggleIsInsideLabByEmail, toggleIsInsideTowerByEmail, findPlayerByEmail, findPlayersByRole, updateIsInsideHallByEmail } = require('./src/database/Player');
 const { toggleCollectedWithArtefactId, getArtefacts } = require('./src/database/Artefact');
 const artefactService = require('./src/services/artefactService');
-const { getPlayersToUpdateHall } = require('./src/utils/utils');
+const { getPlayersInsideHall } = require('./src/utils/utils');
 
 
 // ------------------------------------- //
@@ -149,20 +149,24 @@ io.on("connection", (socket) => {
         await updateIsInsideHallByEmail(email, isInsideHall);
         
         // Get the players data to update the the 'Ancient Hall of Sages'
-        const playersList = await getPlayersToUpdateHall();
+        const playersObject = await getPlayersInsideHall();
+        const allAcolytes = await getAllAcolytes();
 
-        const acolytesList = playersList.filter(player => player.role === "ACOLYTE");
-        const allAcolytesInsideHall = acolytesList.every(acolyte => acolyte.isInsideHall);
+        // Check if all acolytes are inside the hall
+        const allAcolytesInsideHall = allAcolytes.every(acolyte => acolyte.isInsideHall);
 
+        // Check if all artifacts have been collected. 
         const artifacts = await getArtefacts();
         const allArtifactsCollected = artifacts.every(artifact => artifact.collected);
 
         // Notify clients to refresh 'Ancient Hall Of Sages' list
         io.emit("refreshAncientHallOfSagesList", {
-          playersList: playersList,
+          playersObject: playersObject,
           allAcolytesInsideHall: allAcolytesInsideHall, 
           allArtifactsCollected: allArtifactsCollected,
         });
+
+        console.log("============================================");
 
       }
     } catch (error) {
