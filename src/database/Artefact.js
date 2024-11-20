@@ -37,7 +37,7 @@ const resetAllCollected = async () => {
         const result = await Artefact.updateMany({}, { collected: false });
         return result;
     } catch (error) {
-        console.error("Error al restablecer el estado de 'collected' para todos los artefactos:", error);
+        console.error("Error when resetting the collected status for all artefacts:", error);
         throw error;
     }
 };
