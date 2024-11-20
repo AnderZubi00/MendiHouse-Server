@@ -9,9 +9,9 @@ const idCardHandler = require('./src/mqtt/idCardHandler');
 const doorStatusHandler = require('./src/mqtt/doorStatusHandler');
 
 const { updatePlayerByEmail, getAllAcolytes, toggleIsInsideLabByEmail, toggleIsInsideTowerByEmail, findPlayerByEmail, findPlayersByRole, updateIsInsideHallByEmail } = require('./src/database/Player');
-const { toggleCollectedWithArtefactId, getArtefacts } = require('./src/database/Artefact');
+const { toggleCollectedWithArtefactId, getArtefacts, resetAllCollected } = require('./src/database/Artefact');
 const artefactService = require('./src/services/artefactService');
-const { getPlayersToUpdateHall } = require('./src/utils/utils');
+const { getPlayersInsideHall } = require('./src/utils/utils');
 
 
 // ------------------------------------- //
@@ -142,27 +142,31 @@ io.on("connection", (socket) => {
     try {
 
       if (data?.email && data?.isInsideHall != undefined) {
-        
-        const {email, isInsideHall} = data;
+
+        const { email, isInsideHall } = data;
 
         console.log("\n========= Player Has Enter/Exit 'Ancient Hall of Sages' =========");
         await updateIsInsideHallByEmail(email, isInsideHall);
-        
+
         // Get the players data to update the the 'Ancient Hall of Sages'
-        const playersList = await getPlayersToUpdateHall();
+        const playersObject = await getPlayersInsideHall();
+        const allAcolytes = await getAllAcolytes();
 
-        const acolytesList = playersList.filter(player => player.role === "ACOLYTE");
-        const allAcolytesInsideHall = acolytesList.every(acolyte => acolyte.isInsideHall);
+        // Check if all acolytes are inside the hall
+        const allAcolytesInsideHall = allAcolytes.every(acolyte => acolyte.isInsideHall);
 
+        // Check if all artifacts have been collected. 
         const artifacts = await getArtefacts();
         const allArtifactsCollected = artifacts.every(artifact => artifact.collected);
 
         // Notify clients to refresh 'Ancient Hall Of Sages' list
         io.emit("refreshAncientHallOfSagesList", {
-          playersList: playersList,
+          playersObject: playersObject,
           allAcolytesInsideHall: allAcolytesInsideHall, 
           allArtifactsCollected: allArtifactsCollected,
         });
+
+        console.log("============================================");
 
       }
     } catch (error) {
@@ -252,28 +256,27 @@ io.on("connection", (socket) => {
   ///////////////////////////////////////////////////////////////////////////////
   socket.on("checkFourArtefactsCollected", async () => {
     try {
-        // Check if all artefacts are collected using the service
-        const collectedArtefacts = await artefactService.checkAllCollected();
-  
-        if (collectedArtefacts) {
-          // Notify all connected clients about the artefact status
-          io.emit("updateHallOfSages", { message: "The secrets of the Hall have been unlocked!" });
-          socket.emit("fourArtefactsStatus", { status: true, message: "All artefacts collected!", artefacts: collectedArtefacts });
+      // Check if all artefacts are collected using the service
+      const collectedArtefacts = await artefactService.checkAllCollected();
+
+      if (collectedArtefacts) {
+        // Notify all connected clients about the artefact status
+        io.emit("updateHallOfSages", { message: "The secrets of the Hall have been unlocked!" });
+        socket.emit("fourArtefactsStatus", { status: true, message: "All artefacts collected!", artefacts: collectedArtefacts });
       } else {
-          // Notify the requesting client about the status
-          socket.emit("fourArtefactsStatus", { status: false, message: "Not all artefacts are collected yet.", artefacts: null });
+        // Notify the requesting client about the status
+        socket.emit("fourArtefactsStatus", { status: false, message: "Not all artefacts are collected yet.", artefacts: null });
       }
-  } catch (error) {
+    } catch (error) {
       console.error("Error checking artefacts collection:", error);
       // Notify the client about the error
       socket.emit("fourArtefactsStatus", { status: false, message: "Error occurred while checking artefacts.", artefacts: null });
-  }
+    }
   });
 
 
   /////////////////////////////////////////////////////////////////////////////////
   socket.on("showArtefactsToMortimer", () => {
-
     io.emit("pressedShowArtefacts");
   });
 
@@ -302,14 +305,26 @@ io.on("connection", (socket) => {
       // Send message to mortimer that an acolyte failed to open the door
       sendPushNotification(messageRequestMortimerInHall);
 
-  })
+  });
 
   ///////////////////////////////////////////////////////////////////////////////
+
+  socket.on("statusValidateArtifacts", async ({ validated }) => {
+
+    if (!validated) {
+      try {
+        const rejectArtefacts = await resetAllCollected();
+      } catch (error) {
+        console.error(`Error rejecting artifacts:`, error);
+      }
+    } else {
+      //console.log("Artifacts validated");
+    }
+  });
 
 });
 
 ///////////////////////////////////////////////////////////////////////////////
-
 
 
 

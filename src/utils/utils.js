@@ -145,22 +145,29 @@ function sendPushNotification(message) {
   }
 
 
-async function getPlayersToUpdateHall() {
+async function getPlayersInsideHall() {
 
   // Get the Acolyte List
-  const acolyteList = await getAllAcolytes();
+  let acolytesList = await getAllAcolytes();
+
   // Get the Mortimer List
-  const mortimersList = await findPlayersByRole('MORTIMER');
+  let mortimersList = await findPlayersByRole('MORTIMER');
+
   // Get the Villain List
-  const villainsList = await findPlayersByRole('VILLAIN');
+  let villainsList = await findPlayersByRole('VILLAIN');
 
-  // The array to return with all the players that can enter on the hall of sages
-  let playersList = [];
-  playersList = playersList.concat(acolyteList);
-  playersList = playersList.concat(mortimersList);
-  playersList = playersList.concat(villainsList);
+  // Return only the players inside the hall
+  acolytesList = acolytesList.filter(acolyte => acolyte?.isInsideHall);
+  const mortimer = mortimersList.filter(mortimer => mortimer?.isInsideHall)[0];
+  const villain = villainsList.filter(villain => villain?.isInsideHall)[0];
 
-  return playersList;
+  let playersObject = {
+    acolytesList: acolytesList, 
+    mortimer: mortimer, 
+    villain: villain, 
+  };
+
+  return playersObject;
 }
 
 
@@ -169,5 +176,5 @@ async function getPlayersToUpdateHall() {
     sendPushNotification,
     getPlayerScreen,
     isPlayerInsideTowerScreens, 
-    getPlayersToUpdateHall,
+    getPlayersInsideHall,
   }
