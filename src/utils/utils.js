@@ -145,7 +145,8 @@ function sendPushNotification(message) {
   }
 
 
-async function getPlayersToUpdateTheAncientHallOfSagesInsidePlayers() {
+async function getPlayersToUpdateHall() {
+
   // Get the Acolyte List
   const acolyteList = await getAllAcolytes();
   // Get the Mortimer List
@@ -168,5 +169,5 @@ async function getPlayersToUpdateTheAncientHallOfSagesInsidePlayers() {
     sendPushNotification,
     getPlayerScreen,
     isPlayerInsideTowerScreens, 
-    getPlayersToUpdateTheAncientHallOfSagesInsidePlayers,
+    getPlayersToUpdateHall,
   }
