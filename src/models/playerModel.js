@@ -26,6 +26,7 @@ const playerSchema = new Schema({
     isInsideLab: Boolean,
     isInsideTower: Boolean,
     isInsideHall: Boolean,
+    obituaryDiscovered: Boolean,
     fcm_token: String,
     role: String,
     cardId: String
