@@ -289,6 +289,7 @@ io.on("connection", (socket) => {
 
       // Obtain the fcm_token from the Mortimer players array to send the push notification
       const fcm_tokens = mortimers.map(mortimer => mortimer.fcm_token);
+      const unique_fcm_tokens = [...new Set(fcm_tokens)];
 
       // Add the text to the message body and title, for the message we want to send on the push notification
       let bodyText = 'The acolytes are requesting you in the Ancient Hall of Sage.';
@@ -296,8 +297,9 @@ io.on("connection", (socket) => {
       let messageTopic = 'NotifyMortimerEnterHall';
   
       // Create the message object to modify to send it, with fcm_token to send the message to the correct device/user
-      const messageRequestMortimerInHall = createMessageForPushNotification(bodyText, titleText, fcm_tokens, messageTopic);
+      const messageRequestMortimerInHall = createMessageForPushNotification(bodyText, titleText, unique_fcm_tokens, messageTopic);
   
+
       console.log(messageRequestMortimerInHall);
   
       // Send message to mortimer that an acolyte failed to open the door
