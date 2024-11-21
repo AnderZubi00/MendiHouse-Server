@@ -164,6 +164,7 @@ io.on("connection", (socket) => {
           playersObject: playersObject,
           allAcolytesInsideHall: allAcolytesInsideHall, 
           allArtifactsCollected: allArtifactsCollected,
+          artifacts: artifacts,
         });
 
         console.log("============================================");
