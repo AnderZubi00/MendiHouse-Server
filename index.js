@@ -11,8 +11,8 @@ const doorStatusHandler = require('./src/mqtt/doorStatusHandler');
 const { updatePlayerByEmail, getAllAcolytes, toggleIsInsideLabByEmail, toggleIsInsideTowerByEmail, findPlayerByEmail, findPlayersByRole, updateIsInsideHallByEmail, discoverObituary} = require('./src/database/Player');
 const { toggleCollectedWithArtefactId, getArtefacts, resetAllCollected } = require('./src/database/Artefact');
 const artefactService = require('./src/services/artefactService');
-const { getPlayersInsideHall } = require('./src/utils/utils');
-
+const { getPlayersInsideHall, sendPushNotification } = require('./src/utils/utils');
+const {createMessageForPushNotification} = require('./src/messages/messagePushNotifications');
 
 // ------------------------------------- //
 // -----   GENERAL CONFIGURATION   ----- //
@@ -285,12 +285,10 @@ io.on("connection", (socket) => {
 
       ///find mortimer in players collecton 
       // Obtain the Mortimers data
-      const mortimer = await findPlayersByRole("MORTIMER");
-      console.log("Data from players with role MORTIMER: ");
-      console.log(mortimer);
+      const mortimers = await findPlayersByRole("MORTIMER");
 
       // Obtain the fcm_token from the Mortimer players array to send the push notification
-      const fcm_tokens = mortimer.fcm_token;
+      const fcm_tokens = mortimers.map(mortimer => mortimer.fcm_token);
 
       // Add the text to the message body and title, for the message we want to send on the push notification
       let bodyText = 'The acolytes are requesting you in the Ancient Hall of Sage.';
@@ -309,7 +307,7 @@ io.on("connection", (socket) => {
 
   ///////////////////////////////////////////////////////////////////////////////
 
-  socket.on("statusValidateArtifacts", async ({ validated, email }) => {
+  socket.on("statusValidateArtifacts", async ({ validated }) => {
 
     console.log(" ========== statusValidateArtifacts ==========")
     let newPlayerData;
@@ -325,20 +323,29 @@ io.on("connection", (socket) => {
       try {
         console.log("Mortimer has accepted the artifacts");
         const obituaryDiscovered = await discoverObituary();
-        newPlayerData = await findPlayerByEmail(email);
       } catch (error) {
         console.error(`Error rejecting obituaryDiscovered reset:`, error);
       }
     }
-
+    
     io.emit("mortimerValidation", {
       validated: validated,
-      newPlayer: newPlayerData,
     });
 
   });
+  
+  
+  socket.on("updatePlayer", async ({email}) => {      
+    if (email) {  
+      newPlayerData = await findPlayerByEmail(email);   
+      
+      io.emit("updatePlayerData", {
+        newPlayerData: newPlayerData,
+      });
+    }
+  }) 
 
-});
+}); 
 
 ///////////////////////////////////////////////////////////////////////////////
 
