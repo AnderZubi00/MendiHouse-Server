@@ -241,12 +241,23 @@ io.on("connection", (socket) => {
     console.log(`Artefact ID: ${artefactId}, Collect: ${collected}`);
 
     try {
-      const updatedArtefact = await toggleCollectedWithArtefactId(artefactId, collected);
+      const updatedArtefact = await toggleCollectedWithArtefactId(artefactId, collected); 
+      
       io.emit('updatedArtefact', {
         artefactId: updatedArtefact._id,
         collected: updatedArtefact.collected,
         artefactName: updatedArtefact.name,
       });
+
+      const allArtifacts = await getArtefacts();
+      const allArtifactsCollected = allArtifacts.every(artifact => artifact.collected);
+
+      if (allArtifactsCollected) {
+        io.emit('updateHallArtifactsCollected', {
+          allArtifactsCollected: allArtifactsCollected,
+        });
+      }
+
       console.log(`Artefact ${artefactId} updated collected: ${collected}`);
     } catch (error) {
       console.error(`Error updating the artefact ${artefactId}:`, error);
