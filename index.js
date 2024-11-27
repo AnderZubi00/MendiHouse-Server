@@ -353,7 +353,7 @@ io.on("connection", (socket) => {
     if (email) {  
       newPlayerData = await findPlayerByEmail(email);   
       
-      io.emit("updatePlayerData", {
+      socket.emit("updatePlayerData", {
         newPlayerData: newPlayerData,
       });
     }
