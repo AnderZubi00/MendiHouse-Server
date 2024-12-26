@@ -29,7 +29,8 @@ const playerSchema = new Schema({
     obituaryDiscovered: Boolean,
     fcm_token: String,
     role: String,
-    cardId: String
+    cardId: String,
+    isBetrayer: Boolean
 });
 
 // Exportamos el modelo para usarlo en otros ficheros
