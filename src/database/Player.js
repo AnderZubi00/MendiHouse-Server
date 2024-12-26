@@ -61,8 +61,9 @@ const updatePlayerByEmail = async (emailFilter, newPlayerData) => {
 
         // If no player is found, you might want to handle it
         if (!updatedPlayer) {
-            throw new Error(`Player with email ${emailFilter} not found.`);
-        }
+          console.log(`Player with email ${emailFilter} not found.`);
+          return null; // Return null if no player is found
+      }
 
         console.log(`Player with email ${emailFilter} has been updated successfuly to ${updatedPlayer.isInsideLab}`);
 
