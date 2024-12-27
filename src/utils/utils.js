@@ -170,11 +170,16 @@ async function getPlayersInsideHall() {
   return playersObject;
 }
 
+const round = (num) => {
+  return Math.round(num * 100) / 100;
+}
 
-  module.exports = {
-    toggleAcolyteInsideTower,
-    sendPushNotification,
-    getPlayerScreen,
-    isPlayerInsideTowerScreens, 
-    getPlayersInsideHall,
-  }
+
+module.exports = {
+  toggleAcolyteInsideTower,
+  sendPushNotification,
+  getPlayerScreen,
+  isPlayerInsideTowerScreens, 
+  getPlayersInsideHall,
+  round
+}
