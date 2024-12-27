@@ -17,7 +17,8 @@ const { getPlayersInsideHall, sendPushNotification } = require('./src/utils/util
 const {createMessageForPushNotification} = require('./src/messages/messagePushNotifications');
 
 // Cron
-const { resistanceCron } = require('./src/utils/crons/crons')
+const { resistanceCron } = require('./src/utils/crons/resistanceCron')
+const { sickenCron } = require('./src/utils/crons/sickenCron')
 
 // ------------------------------------- //
 // -----   GENERAL CONFIGURATION   ----- //
@@ -383,15 +384,14 @@ io.on("connection", (socket) => {
 
 //////////////////
 
-
 // --------------------------- //
 // -----   CRON JOBS   ------ //
 // --------------------------- //
 
-
-cron.schedule('*/30 * * * *', () => {
-  console.log('Running cron job');
-  resistanceCron();
+cron.schedule('*/30 * * * *', async () => {
+  console.log('Running cron jobs');
+  await resistanceCron();
+  await sickenCron();
 });
 
 

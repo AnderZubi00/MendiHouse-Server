@@ -30,7 +30,8 @@ const playerSchema = new Schema({
     fcm_token: String,
     role: String,
     cardId: String,
-    isBetrayer: Boolean
+    isBetrayer: Boolean,
+    diseases: Array
 });
 
 // Exportamos el modelo para usarlo en otros ficheros
