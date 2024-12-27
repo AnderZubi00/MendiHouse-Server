@@ -73,8 +73,6 @@ const updatePlayerByEmail = async (emailFilter, newPlayerData) => {
       return null; // Return null if no player is found
     }
 
-    console.log(`Player with email ${emailFilter} has been updated successfuly to ${updatedPlayer.isInsideLab}`);
-
     return updatedPlayer;
 
   } catch (error) {

@@ -1,4 +1,5 @@
 const playerService = require("../services/playerService");
+const {updatePlayerByEmail} = require("../services/playerService");
 const { toggleIsInsideLabByEmail } = require("../database/Player");
 
 const getAllPlayers = async (req, res) => {
@@ -127,12 +128,47 @@ const toggleLaboratoryEntrance = async (req, res) => {
             data: { error: error?.message || error }
         });
     }
-
 }
+
+const updatePlayerAttributes = async (req, res) => {
+    console.log("\n========= UPDATE PLAYER ATTRIBUTES =========");
+    const { email, attributes } = req.body;
+
+    // Validation for email and attributes object
+    if (!email || typeof attributes !== 'object' || attributes === null) {
+        console.error("Invalid input: Email or attributes object missing/invalid");
+        return res.status(400).send({
+            status: "FAILED",
+            data: { error: "Email and attributes object are required" },
+        });
+    }
+
+    try {
+        // Dynamically update player with the given attributes
+        const updatedPlayer = await updatePlayerByEmail(email, attributes);
+
+        if (!updatedPlayer) {
+            console.error("Player not found for given email:", email);
+            return res.status(404).send({ status: "FAILED", data: { error: "Player not found" } });
+        }
+
+        console.log("Update succesful of the attributes for the player:", Object.keys(attributes));
+        return res.status(200).send({ status: "OK", data: updatedPlayer });
+    } catch (error) {
+        console.error("Error updating player attributes:", error);
+        return res.status(500).send({
+            status: "FAILED",
+            data: { error: "An error occurred while updating player attributes" },
+        });
+    }
+};
+
+
 
 module.exports = {
     getAllPlayers,
     getAllAcolytes,
     updateOrCreate,
-    toggleLaboratoryEntrance
+    toggleLaboratoryEntrance,
+    updatePlayerAttributes
 };
