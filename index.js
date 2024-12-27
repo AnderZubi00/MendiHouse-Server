@@ -4,15 +4,20 @@ const { Server } = require("socket.io");
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const mqtt = require('mqtt'); // Import the MQTT package
+const cron = require('node-cron');
 const fs = require('fs');
 const idCardHandler = require('./src/mqtt/idCardHandler');
 const doorStatusHandler = require('./src/mqtt/doorStatusHandler');
 
+// Database Functions
 const { updatePlayerByEmail, getAllAcolytes, toggleIsInsideLabByEmail, toggleIsInsideTowerByEmail, findPlayerByEmail, findPlayersByRole, updateIsInsideHallByEmail, discoverObituary} = require('./src/database/Player');
 const { toggleCollectedWithArtefactId, getArtefacts, resetAllCollected } = require('./src/database/Artefact');
 const artefactService = require('./src/services/artefactService');
 const { getPlayersInsideHall, sendPushNotification } = require('./src/utils/utils');
 const {createMessageForPushNotification} = require('./src/messages/messagePushNotifications');
+
+// Cron
+const { resistanceCron } = require('./src/utils/crons/crons')
 
 // ------------------------------------- //
 // -----   GENERAL CONFIGURATION   ----- //
@@ -377,6 +382,18 @@ io.on("connection", (socket) => {
 // doorStatusHandler.handleDoorAccess(mqttClient, io);
 
 //////////////////
+
+
+// --------------------------- //
+// -----   CRON JOBS   ------ //
+// --------------------------- //
+
+
+cron.schedule('*/30 * * * *', () => {
+  console.log('Running cron job');
+  resistanceCron();
+});
+
 
 // --------------------------- //
 // -----   RUN SERVER   ------ //
