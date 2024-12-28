@@ -10,7 +10,7 @@ const idCardHandler = require('./src/mqtt/idCardHandler');
 const doorStatusHandler = require('./src/mqtt/doorStatusHandler');
 
 // Database Functions
-const { updatePlayerByEmail, getAllAcolytes, toggleIsInsideLabByEmail, toggleIsInsideTowerByEmail, findPlayerByEmail, findPlayersByRole, updateIsInsideHallByEmail, discoverObituary} = require('./src/database/Player');
+const { updatePlayerByEmail, getAllAcolytes, toggleIsInsideLabByEmail, toggleIsInsideTowerByEmail, findPlayerByEmail, findPlayersByRole, updateIsInsideHallByEmail, discoverObituary, resetAngeloCaptured, angeloInDungeon} = require('./src/database/Player');
 const { toggleCollectedWithArtefactId, getArtefacts, resetAllCollected } = require('./src/database/Artefact');
 const artefactService = require('./src/services/artefactService');
 const { getPlayersInsideHall, sendPushNotification } = require('./src/utils/utils');
@@ -298,6 +298,12 @@ io.on("connection", (socket) => {
     io.emit("pressedShowArtefacts");
   });
 
+  /////////////////////////////////////////////////////////////////////////////////
+  socket.on("showAngeloToMortimer", () => {
+    console.log("enseñando a mortimer Angelo");
+    io.emit("pressedShowAngelo");
+  });
+
   ///////////////////////////////////////////////////////////////////////////////
   socket.on("notifyMortimer", async () => {
 
@@ -353,6 +359,36 @@ io.on("connection", (socket) => {
     });
 
   });
+
+  ///////////////////////////////////////////////////////////////////////////////
+  socket.on("statusValidateAngelo", async ({ validated }) => {
+    console.log("========== statusValidateAngelo ==========");
+  
+    if (!validated) {
+      try {
+        console.log("Mortimer has rejected Angelo.");
+        const resetAngeloStatus = await resetAngeloCaptured();
+        console.log("Reset Angelo Captured:", resetAngeloStatus);
+      } catch (error) {
+        console.error("Error resetting Angelo captured status:", error);
+      }
+    } else {
+      try {
+        console.log("Mortimer has accepted Angelo.");
+        const angeloDungeonStatus = await angeloInDungeon();
+        console.log("Set Angelo in Dungeon:", angeloDungeonStatus);
+      } catch (error) {
+        console.error("Error setting Angelo in dungeon:", error);
+      }
+    }
+  
+    io.emit("mortimerAngeloValidation", {
+      validated: validated,
+    });
+  });
+  
+
+  ///////////////////////////////////////////////////////////////////////////////
   
   
   socket.on("updatePlayer", async ({email}) => {      

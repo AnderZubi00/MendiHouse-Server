@@ -54,6 +54,7 @@ const createPlayer = async (playerData) => {
         playerData.obituaryDiscovered = false;
         playerData.cardId = null;
         playerData.isBetrayer = false;
+        playerData.hasAngeloCaptured = null;
 
         const newPlayer = await Player.createPlayer(playerData);
         return newPlayer;

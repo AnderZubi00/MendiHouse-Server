@@ -255,6 +255,25 @@ const discoverObituary = async () => {
   }
 };
 
+const angeloInDungeon = async () => {
+  try {
+    const result = await Player.updateMany({}, { angeloInDungeon: true });
+    return result;
+  } catch (error) {
+    console.error("Error setting Angelo in dungeon for all players:", error);
+    throw error;
+  }
+};
+
+const resetAngeloCaptured = async () => {
+  try {
+    const result = await Player.updateMany({}, { hasAngeloCaptured: false });
+    return result;
+  } catch (error) {
+    console.error("Error resetting Angelo captured status for all players:", error);
+    throw error;
+  }
+};
 
 const updateAttribute = async (email, attribute, newValue) => {
   
@@ -297,6 +316,8 @@ module.exports = {
   findPlayerByIdCard,
   findPlayersByRole,
   discoverObituary,
+  angeloInDungeon,
+  resetAngeloCaptured,
   getLoyalAcolytes,
   updateAttribute,
 }

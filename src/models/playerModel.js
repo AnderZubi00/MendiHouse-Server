@@ -1,5 +1,6 @@
 // Cargamos el módulo de mongoose
 const mongoose = require('mongoose');
+const { angeloInDungeon } = require('../database/Player');
 
 //Usaremos los esquemas
 const { Schema } = mongoose;
@@ -31,7 +32,9 @@ const playerSchema = new Schema({
     role: String,
     cardId: String,
     isBetrayer: Boolean,
-    diseases: Array
+    diseases: Array,
+    hasAngeloCaptured: { type: Boolean, default: null },
+    angeloInDungeon: { type: Boolean, default: false },
 });
 
 // Exportamos el modelo para usarlo en otros ficheros
