@@ -1,6 +1,5 @@
 // Cargamos el módulo de mongoose
 const mongoose = require('mongoose');
-const { angeloInDungeon } = require('../database/Player');
 
 //Usaremos los esquemas
 const { Schema } = mongoose;

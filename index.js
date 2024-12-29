@@ -10,7 +10,7 @@ const idCardHandler = require('./src/mqtt/idCardHandler');
 const doorStatusHandler = require('./src/mqtt/doorStatusHandler');
 
 // Database Functions
-const { updatePlayerByEmail, getAllAcolytes, toggleIsInsideLabByEmail, toggleIsInsideTowerByEmail, findPlayerByEmail, findPlayersByRole, updateIsInsideHallByEmail, discoverObituary, resetAngeloCaptured, angeloInDungeon} = require('./src/database/Player');
+const { updatePlayerByEmail, getAllAcolytes, toggleIsInsideLabByEmail, toggleIsInsideTowerByEmail, findPlayerByEmail, findPlayersByRole, updateIsInsideHallByEmail, discoverObituary, resetAngeloCaptured, angeloInDungeonUpdate} = require('./src/database/Player');
 const { toggleCollectedWithArtefactId, getArtefacts, resetAllCollected } = require('./src/database/Artefact');
 const artefactService = require('./src/services/artefactService');
 const { getPlayersInsideHall, sendPushNotification } = require('./src/utils/utils');
@@ -375,7 +375,7 @@ io.on("connection", (socket) => {
     } else {
       try {
         console.log("Mortimer has accepted Angelo.");
-        const angeloDungeonStatus = await angeloInDungeon();
+        const angeloDungeonStatus = await angeloInDungeonUpdate();
         console.log("Set Angelo in Dungeon:", angeloDungeonStatus);
       } catch (error) {
         console.error("Error setting Angelo in dungeon:", error);

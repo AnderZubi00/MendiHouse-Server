@@ -255,7 +255,7 @@ const discoverObituary = async () => {
   }
 };
 
-const angeloInDungeon = async () => {
+const angeloInDungeonUpdate = async () => {
   try {
     const result = await Player.updateMany({}, { angeloInDungeon: true });
     return result;
@@ -316,7 +316,7 @@ module.exports = {
   findPlayerByIdCard,
   findPlayersByRole,
   discoverObituary,
-  angeloInDungeon,
+  angeloInDungeonUpdate,
   resetAngeloCaptured,
   getLoyalAcolytes,
   updateAttribute,
