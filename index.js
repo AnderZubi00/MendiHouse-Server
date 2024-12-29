@@ -389,6 +389,12 @@ io.on("connection", (socket) => {
   
 
   ///////////////////////////////////////////////////////////////////////////////
+  socket.on("captureAngelo", () => {
+    console.log("Angelo captured");
+    socket.broadcast.emit("angeloCaptured");
+  });
+
+  ///////////////////////////////////////////////////////////////////////////////
   
   
   socket.on("updatePlayer", async ({email}) => {      
