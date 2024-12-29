@@ -67,13 +67,19 @@ const updateOrCreate = async (req, res) => {
         // console.log(`Received player data of user ${playerData?.email}:`, playerData);
         const playerExists = await playerService.findPlayerByEmail(playerData.email);
 
-        // If the Player exists, we update it.
-        // If the Player does not exist, we create it.
         if (playerExists) { 
             console.log("The Player already exists, updating player...");
-            const updatedPlayer = await playerService.updatePlayerByEmail(playerData.email, playerData);
+          
+            // Preserve isBetrayer from the existing player
+            const updatedPlayerData = {
+              ...playerData, // Spread the incoming playerData
+              isBetrayer: playerExists.isBetrayer, // Override isBetrayer with the value from playerExists
+            };
+          
+            const updatedPlayer = await playerService.updatePlayerByEmail(playerData.email, updatedPlayerData);
+          
             return res.send({ status: "Ok", data: updatedPlayer });
-
+        
         } else { 
             console.log("The Player does not exist, creating player...");
             const newPlayer = await playerService.createPlayer(playerData);
