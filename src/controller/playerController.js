@@ -49,10 +49,10 @@ const updateOrCreate = async (req, res) => {
     console.log('Inserting or updating Player document in MongoDB');
     
     try {
-        const playerData = req.body; // Get player data from the request body
+        const kaotikaPlayerData = req.body; // Get player data from the request body
         
         // Validating all required fields
-        if (!playerData?.email) {
+        if (!kaotikaPlayerData?.email) {
             console.log("Error inserting Player: Email field not provided");
             return res
             .status(400)
@@ -65,24 +65,25 @@ const updateOrCreate = async (req, res) => {
         }
         
         // console.log(`Received player data of user ${playerData?.email}:`, playerData);
-        const playerExists = await playerService.findPlayerByEmail(playerData.email);
+        const dbPlayerData = await playerService.findPlayerByEmail(kaotikaPlayerData.email);
 
-        if (playerExists) { 
+        if (dbPlayerData) { 
             console.log("The Player already exists, updating player...");
           
             // Preserve isBetrayer from the existing player
             const updatedPlayerData = {
-              ...playerData, // Spread the incoming playerData
-              isBetrayer: playerExists.isBetrayer, // Override isBetrayer with the value from playerExists
+              ...kaotikaPlayerData, // Spread the incoming kaotika's player data
+              attributes: dbPlayerData.attributes, // Override attributes with the value from the our database.
+              isBetrayer: dbPlayerData.isBetrayer, // Override isBetrayer with the value from the our database.
             };
           
-            const updatedPlayer = await playerService.updatePlayerByEmail(playerData.email, updatedPlayerData);
+            const updatedPlayer = await playerService.updatePlayerByEmail(kaotikaPlayerData.email, updatedPlayerData);
           
             return res.send({ status: "Ok", data: updatedPlayer });
         
         } else { 
             console.log("The Player does not exist, creating player...");
-            const newPlayer = await playerService.createPlayer(playerData);
+            const newPlayer = await playerService.createPlayer(kaotikaPlayerData);
             return res.send({ status: "Ok", data: newPlayer });
         }
     } catch (error) {
