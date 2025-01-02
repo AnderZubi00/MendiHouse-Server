@@ -25,7 +25,7 @@ const weakenAcolyte = async (acolyte) => {
 
   // Decrease resistance
   const currentResistence = acolyte.attributes.resistence;
-  const newResistence = round(currentResistence * 0.9);
+  const newResistence = round(currentResistence * 0.9) || 0;
   let weakenedPlayer = await updateAttribute(acolyte.email, "resistence", newResistence);
 
   // Apply penalities.
@@ -60,7 +60,7 @@ const applyPenalty = async (player, attribute) => {
 
     const resistence = player.attributes.resistence;
     const attributeValue = player.attributes[attribute];
-    const newAttribute = round(attributeValue * resistence / 100);
+    const newAttribute = round(attributeValue * resistence / 100) || 0;
 
     const updatedPlayer = updateAttribute(player.email, attribute, newAttribute);
 
