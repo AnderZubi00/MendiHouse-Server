@@ -1,6 +1,7 @@
 const playerService = require("../services/playerService");
 const { updatePlayerByEmail } = require("../services/playerService");
-const { toggleIsInsideLabByEmail } = require("../database/Player");
+const { toggleIsInsideLabByEmail, findPlayerByEmail, applyDiseasePenalty } = require("../database/Player");
+const ValidationError = require('../utils/errors');
 
 const getAllPlayers = async (req, res) => {
 
@@ -172,11 +173,64 @@ const updatePlayerAttributes = async (req, res) => {
 };
 
 
+const sickenPlayer = async (req, res) => {
+
+  console.log("\n========= SICKENING PLAYER =========");
+
+  try {
+    const { email, disease } = req.body;
+
+    // Validate data  
+    if (!email) {throw new Error("Email not provided")}
+    if (!disease) {throw new Error("Disease not provided")}
+    if (!disease?.modifiers || typeof disease?.modifiers !== 'object') {throw new Error("Disease does not have an expected structure.")}
+
+    // Get player data
+    const acolyte = await findPlayerByEmail(email);
+    if (acolyte === null) {throw new Error(`Could not find acolyte with email ${email}.`)}
+
+    // Check if player already suffers the disease
+    if (acolyte.diseases.includes(disease.name)) {throw new ValidationError(`Acolyte already suffers ${disease.name}.`)}
+
+    // Validate if is acolyte and is loyal
+    if (acolyte.isBetrayer) {throw new ValidationError("The selected acolyte is a betrayer. It can not be sicken.")}
+
+    // Apply penalties 
+    const newAttributes = applyDiseasePenalty(acolyte.attributes, disease.modifiers);
+
+    // Push disease name to diseases array
+    const newDiseases = [...acolyte.diseases, disease.name];
+
+    // Update the changes in the database.
+    acolyte.diseases = newDiseases;
+
+    acolyte.attributes = newAttributes;
+    acolyte.markModified('attributes'); // Tells Mongoose the 'attributes' object changed so it will save those updates.
+  
+    // Make the change in the database.
+    await acolyte.save(); 
+     
+    // Return the new player data.
+    return res.status(200).send({ status: "OK", playerData: acolyte });
+
+  } catch (error) {
+    console.log("Error sickening player: ", error.message); 
+    const errorMessage = error.name === 'ValidationError' ? error.message : `Internal Error: ${error.message}`;  
+    console.log(errorMessage);
+    return res.status(500).send({
+      status: "FAILED",
+      message: errorMessage,    
+    })
+  }
+
+
+}
 
 module.exports = {
   getAllPlayers,
   getAllAcolytes,
   updateOrCreate,
   toggleLaboratoryEntrance,
-  updatePlayerAttributes
+  updatePlayerAttributes,
+  sickenPlayer
 };
