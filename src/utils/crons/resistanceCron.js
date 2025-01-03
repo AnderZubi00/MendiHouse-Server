@@ -1,6 +1,6 @@
 
-const { getLoyalAcolytes, updateAttribute, findPlayerByEmail } = require('../../database/Player')
-const { round } = require('../utils');
+const { getLoyalAcolytes, updateAttribute } = require('../../database/Player')
+const { round } = require('../math');
 
 const resistanceCron = async () => {
 
