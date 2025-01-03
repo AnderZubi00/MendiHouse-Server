@@ -10,7 +10,8 @@ router.patch("/", playerController.updateOrCreate);
 router.get("/acolytes", playerController.getAllAcolytes);
 router.post("/toggleLaboratoryEntrance", playerController.toggleLaboratoryEntrance);
 router.post("/attributes", playerController.updatePlayerAttributes);
-router.post("/sickenPlayer", playerController.sickenPlayer)
+router.patch("/sickenPlayer", playerController.sickenPlayer)
+router.patch("/healPlayer", playerController.healPlayer)
 
 
 module.exports = router;

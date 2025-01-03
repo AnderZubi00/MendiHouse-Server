@@ -355,8 +355,59 @@ const applyDiseasePenalty = (attributes, modifiers) => {
     console.log("Error at applyDiseasePenalty().")
     throw error;
   }
+}
 
 
+const applyHealingReward = (attributes, modifiers) => {
+
+  try {
+
+    let returnAttributes = attributes;
+      
+    console.log("MODIFIERS");
+    console.log(modifiers);  
+      
+    console.log("--------------") 
+
+    console.log("ANTES");
+    console.log(returnAttributes);  
+       
+    console.log("--------------") 
+
+    Object.keys(modifiers).forEach(modifier => {
+      
+      if (!Object.keys(attributes).includes(modifier)) {
+        console.log(`The player does not have ${modifier} attribute.`);
+        return
+      }
+
+      const attributeValue = attributes[modifier];
+      const modifierValue = modifiers[modifier];
+
+      // Some modifiers are numeric (unit changes) and other percentage.
+
+      if (typeof modifierValue === 'number') {
+        returnAttributes[modifier] = round(attributeValue - modifierValue);
+      }
+
+      if (typeof modifierValue === 'string') {
+        // const modifierValue: '-60%' -> const percentage = -60 (number).
+        const percentage = parseFloat(modifierValue.replace('%', ''));
+        const newAttribute = round(attributeValue / ((100+percentage)/100));
+        returnAttributes[modifier] = newAttribute;
+      }
+
+    }); 
+     
+    console.log("DESPUES");
+    console.log(returnAttributes);  
+
+    return returnAttributes;
+
+  } catch (error) {
+    console.log("Error at applyDiseasePenalty().")
+    throw error;
+  }
 }
 
 module.exports = {
@@ -375,5 +426,6 @@ module.exports = {
   resetAngeloCaptured,
   getLoyalAcolytes,
   updateAttribute,
-  applyDiseasePenalty
+  applyDiseasePenalty,
+  applyHealingReward
 }
