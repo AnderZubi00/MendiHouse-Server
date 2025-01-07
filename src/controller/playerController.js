@@ -1,6 +1,6 @@
 const playerService = require("../services/playerService");
-const { updatePlayerByEmail } = require("../services/playerService");
-const { toggleIsInsideLabByEmail, findPlayerByEmail, applyDiseasePenalty, applyHealingReward } = require("../database/Player");
+const { updatePlayerByEmail, restPlayer } = require("../services/playerService");
+const { toggleIsInsideLabByEmail, findPlayerByEmail, applyDiseasePenalty, applyHealingReward,  } = require("../database/Player");
 const ValidationError = require('../utils/errors');
 
 const getAllPlayers = async (req, res) => {
@@ -265,13 +265,37 @@ const healPlayer = async (req, res) => {
   } catch (error) {
     console.log("Error sickening player: ", error.message); 
     const errorMessage = error.name === 'ValidationError' ? error.message : `Internal Error: ${error.message}`;  
-    console.log(errorMessage);
     return res.status(500).send({
       status: "FAILED",
       message: errorMessage,    
     })
   }
 }
+
+const rest = async (req, res) => {
+
+  console.log(`\n========= PLAYER IS RESTING =========`);
+
+  try {
+
+    const {email} = req.body;
+    if (!email || typeof email !== "string") {throw new Error("Email field is not valid!")}
+
+    const restedPlayer = await restPlayer(email);
+    
+    return res.status(200).send({ status: "OK", restedPlayer: restedPlayer });
+
+
+  } catch (error) {
+    console.log("Error resting player: ", error.message);
+    const errorMessage = error.name === 'ValidationError' ? error.message : `Internal Error: ${error.message}`;  
+    return res.status(500).send({
+      status: "FAILED",
+      message: errorMessage,    
+    })
+  }
+
+} 
 
 module.exports = {
   getAllPlayers,
@@ -280,5 +304,6 @@ module.exports = {
   toggleLaboratoryEntrance,
   updatePlayerAttributes,
   sickenPlayer,
-  healPlayer
+  healPlayer,
+  rest
 };

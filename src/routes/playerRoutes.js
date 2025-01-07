@@ -12,6 +12,7 @@ router.post("/toggleLaboratoryEntrance", playerController.toggleLaboratoryEntran
 router.post("/attributes", playerController.updatePlayerAttributes);
 router.patch("/sickenPlayer", playerController.sickenPlayer)
 router.patch("/healPlayer", playerController.healPlayer)
+router.patch("/rest", playerController.rest)
 
 
 module.exports = router;

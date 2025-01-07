@@ -280,7 +280,6 @@ const updateAttribute = async (email, attribute, newValue) => {
   
   try {
 
-    // Find the player by field and update with newPlayer data
     const updatedPlayer = await Player.findOneAndUpdate(
       { email: email },     // Filter (find player with this field)
       {
