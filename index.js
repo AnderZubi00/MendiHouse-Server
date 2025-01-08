@@ -10,7 +10,7 @@ const idCardHandler = require('./src/mqtt/idCardHandler');
 const doorStatusHandler = require('./src/mqtt/doorStatusHandler');
 
 // Database Functions
-const { updatePlayerByEmail, getAllAcolytes, toggleIsInsideLabByEmail, toggleIsInsideTowerByEmail, findPlayerByEmail, findPlayersByRole, updateIsInsideHallByEmail, discoverObituary, resetAngeloCaptured, angeloInDungeonUpdate} = require('./src/database/Player');
+const { updatePlayerByEmail, getAllAcolytes, getLoyalAcolytes, toggleIsInsideLabByEmail, toggleIsInsideTowerByEmail, findPlayerByEmail, findPlayersByRole, updateIsInsideHallByEmail, discoverObituary, resetAngeloCaptured, angeloInDungeonUpdate} = require('./src/database/Player');
 const { toggleCollectedWithArtefactId, getArtefacts, resetAllCollected } = require('./src/database/Artefact');
 const artefactService = require('./src/services/artefactService');
 const { getPlayersInsideHall, sendPushNotification } = require('./src/utils/utils');
@@ -156,7 +156,7 @@ io.on("connection", (socket) => {
 
         // Get the players data to update the the 'Ancient Hall of Sages'
         const playersObject = await getPlayersInsideHall();
-        const allAcolytes = await getAllAcolytes();
+        const allAcolytes = await getLoyalAcolytes();
 
         // Check if all acolytes are inside the hall
         const allAcolytesInsideHall = allAcolytes.every(acolyte => acolyte.isInsideHall);
