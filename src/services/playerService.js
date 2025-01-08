@@ -1,6 +1,7 @@
 const Player = require('../database/Player'); 
 const {updateAttribute} = require('../database/Player'); 
 const ValidationError = require('../utils/errors');
+const {resetAttribute} = require('../utils/math');
 
 // Service to get all players from the database
 const getAllPlayers = async () => {
@@ -98,8 +99,21 @@ const restPlayer = async (email) => {
 
     if (player.attributes.resistence === undefined) {throw new Error(`Player does not have resistence attribute`)}
     if (player.attributes.resistence<=30) {throw new ValidationError("You must have more than 30 points of resistence to be able to rest")} 
+      
+    // Example usage:
+    const currentStrength = player.attributes.strength;
+    const currentDexterity = player.attributes.dexterity;
+    const currentIntelligence = player.attributes.intelligence;
+    const currentResistance = player.attributes.resistence; 
 
-    let restedPlayer = await updateAttribute(player.email, "resistence", 100);
+    const restoredlStrength = resetAttribute(currentStrength, currentResistance);
+    const restoredlDexterity = resetAttribute(currentDexterity, currentResistance);
+    const restoredlIntelligence = resetAttribute(currentIntelligence, currentResistance);
+    
+    let restedPlayer = await updateAttribute(player.email, "strength", restoredlStrength);
+    restedPlayer = await updateAttribute(player.email, "dexterity", restoredlDexterity);
+    restedPlayer = await updateAttribute(player.email, "intelligence", restoredlIntelligence);
+    restedPlayer = await updateAttribute(player.email, "resistence", 100);
 
     return restedPlayer;
 
