@@ -77,7 +77,7 @@ const updateOrCreate = async (req, res) => {
       const updatedPlayerData = {
         ...kaotikaPlayerData, // Spread the incoming kaotika's player data
         attributes: dbPlayerData.attributes, // Override attributes with the value from the our database.
-        isBetrayer: dbPlayerData.isBetrayer, // Override isBetrayer with the value from the our database.
+        //isBetrayer: dbPlayerData.isBetrayer, // Override isBetrayer with the value from the our database.
       };
 
       const updatedPlayer = await playerService.updatePlayerByEmail(kaotikaPlayerData.email, updatedPlayerData);
