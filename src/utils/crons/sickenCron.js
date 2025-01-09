@@ -74,7 +74,7 @@ const choseAcolyteRandomly = async () => {
   const acolytes = await getLoyalAcolytes();
     
   if (acolytes.length === 0) {
-    throw new Error("There are loyal acolytes in the database");
+    throw new Error("There are not loyal acolytes in the database");
   }
 
   const randomAcolyte = acolytes[Math.floor(Math.random() * acolytes.length)];
