@@ -1,6 +1,6 @@
 const { getLoyalAcolytes } = require('../../database/Player')
 
-const diseases = [
+const epicDiseases = [
   {
     name: 'Putrid Plague',
     modifiers: { intelligence: 75 } // -75%
@@ -32,14 +32,14 @@ const sickenCron = async () => {
       return
     }  
 
-    const disease = diseases[Math.floor(Math.random() * diseases.length)];
+    const disease = epicDiseases[Math.floor(Math.random() * epicDiseases.length)];
 
     // If the player already suffers the disease dont do anything.
-    if (acolyte?.diseases !== undefined && acolyte?.diseases.includes(disease.name)) {
-      console.log(`The player ${acolyte.email} already suffer the ${disease.name} disease. No disease will be applied.`);
+    if (suffersEpicDisease(acolyte.diseases)) {
+      console.log(`The player ${acolyte.email} already suffer a epic disease. No disease will be applied.`);
       return;
     }
-    
+
     // Apply the disease to the player.
     applyDisease(acolyte, disease);
 
@@ -70,9 +70,9 @@ const applyDisease = async (acolyte, disease) => {
 }
 
 const choseAcolyteRandomly = async () => {
- 
+
   const acolytes = await getLoyalAcolytes();
-    
+
   if (acolytes.length === 0) {
     throw new Error("There are not loyal acolytes in the database");
   }
@@ -81,6 +81,17 @@ const choseAcolyteRandomly = async () => {
 
   return randomAcolyte;
 }
+
+const suffersEpicDisease = (playerDiseasesNames) => {
+
+  if (epicDiseases === undefined || epicDiseases.length === 0) { return false }
+
+  const hasDisease = epicDiseases.map((epicDisease) => {
+    return playerDiseasesNames.includes(epicDisease.name);
+  })
+
+  return hasDisease.some(hasDisease => hasDisease);
+} 
 
 module.exports = {
   sickenCron
