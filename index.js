@@ -426,6 +426,9 @@ io.on("connection", (socket) => {
     await sickenCron(io);
   });
 
+  socket.on("resistence", async () => {
+    await resistanceCron(io);
+  });
 
 }); 
 
@@ -459,7 +462,7 @@ cron.schedule('*/30 * * * *', async () => {
  
 // ---------- TESTING ! ---------------- //
 // (async () => {
-//   await sickenCron(io);
+//   await resistanceCron(io);
  
 //   // const player = await findPlayerByEmail('julen.izeta@ikasle.aeg.eus');
 //   // await updateClientPlayerData(player.email, io);
