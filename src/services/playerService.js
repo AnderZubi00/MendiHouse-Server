@@ -98,7 +98,7 @@ const restPlayer = async (email) => {
     if (!player) {throw new Error(`Could not find player with email ${player.email}`)}
 
     if (player.attributes.resistence === undefined) {throw new Error(`Player does not have resistence attribute`)}
-    if (player.attributes.resistence<=30) {throw new ValidationError("You must have more than 30 points of resistence to be able to rest")} 
+    // if (player.attributes.resistence<=30) {throw new ValidationError(`You must have more than 30 points of resistence to be able to rest. You currently have ${player.attributes.resistence}`)} 
       
     // Example usage:
     const currentStrength = player.attributes.strength;

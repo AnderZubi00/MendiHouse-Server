@@ -1,4 +1,5 @@
 const { getLoyalAcolytes } = require('../../database/Player')
+const { updateClientPlayerData } = require('../../utils/utils')
 
 const epicDiseases = [
   {
@@ -15,7 +16,7 @@ const epicDiseases = [
   }
 ]
 
-const sickenCron = async () => {
+const sickenCron = async (io) => {
 
   try {
 
@@ -38,13 +39,16 @@ const sickenCron = async () => {
     if (suffersEpicDisease(acolyte.diseases)) {
       console.log(`The player ${acolyte.email} already suffer a epic disease. No disease will be applied.`);
       return;
-    }
+    } 
 
     // Apply the disease to the player.
-    applyDisease(acolyte, disease);
+    await applyDisease(acolyte, disease);
 
     console.log(`The player ${acolyte.email} has been sickened of ${disease.name}. The penalty have been applied sucessfully.`)
 
+    // Update the sicken player's 'playerData' context value.
+    await updateClientPlayerData(acolyte.email, io);  
+ 
   } catch (error) {
     console.log("Error in sicken cron: ", error);
   }
@@ -91,7 +95,7 @@ const suffersEpicDisease = (playerDiseasesNames) => {
   })
 
   return hasDisease.some(hasDisease => hasDisease);
-} 
+}
 
 module.exports = {
   sickenCron

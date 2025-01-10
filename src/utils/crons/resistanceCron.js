@@ -2,10 +2,9 @@
 const { getLoyalAcolytes, updateAttribute } = require('../../database/Player')
 const { round } = require('../math');
 
-const resistanceCron = async () => {
+const resistanceCron = async (io) => {
 
   try {
-
     console.log("EXECUTING RESISTENCE CRON");
     const loyalAcolytes = await getLoyalAcolytes();
     loyalAcolytes.forEach(weakenAcolyte);

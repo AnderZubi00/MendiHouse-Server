@@ -2,6 +2,7 @@ const playerService = require("../services/playerService");
 const { updatePlayerByEmail, restPlayer } = require("../services/playerService");
 const { toggleIsInsideLabByEmail, findPlayerByEmail, applyDiseasePenalty, applyHealingReward,  } = require("../database/Player");
 const ValidationError = require('../utils/errors');
+const { updateClientPlayerData } = require('../utils/utils');
 
 const getAllPlayers = async (req, res) => {
 
@@ -180,6 +181,7 @@ const sickenPlayer = async (req, res) => {
 
   try {
     const { email, disease } = req.body;
+    const io = req.io;
 
     // Validate data  
     if (!email) {throw new Error("Email not provided")}
@@ -211,6 +213,9 @@ const sickenPlayer = async (req, res) => {
     // Make the change in the database.
     await acolyte.save(); 
      
+    // Update client's screen.
+    await updateClientPlayerData(acolyte.email, io);
+
     // Return the new player data.
     return res.status(200).send({ status: "OK", playerData: acolyte });
 
@@ -232,6 +237,7 @@ const healPlayer = async (req, res) => {
 
   try {
     const { email, disease } = req.body;
+    const io = req.io;
 
     // Validate data  
     if (!email) {throw new Error("Email not provided")}
@@ -259,7 +265,10 @@ const healPlayer = async (req, res) => {
   
     // Save the changes in the database.
     await acolyte.save(); 
-     
+
+    // Update client's screen.
+    await updateClientPlayerData(acolyte.email, io);
+
     // Return the new player data.
     return res.status(200).send({ status: "OK", playerData: acolyte });
 
@@ -280,12 +289,16 @@ const rest = async (req, res) => {
   try {
 
     const {email} = req.body;
+    const io = req.io;
+
     if (!email || typeof email !== "string") {throw new Error("Email field is not valid!")}
 
     const restedPlayer = await restPlayer(email);
     
-    return res.status(200).send({ status: "OK", restedPlayer: restedPlayer });
+    // Update client's screen.
+    await updateClientPlayerData(restedPlayer.email, io);
 
+    return res.status(200).send({ status: "OK", restedPlayer: restedPlayer });
 
   } catch (error) {
     console.log("Error resting player: ", error.message);
