@@ -1,24 +1,24 @@
 
 const { getLoyalAcolytes, updateAttribute } = require('../../database/Player')
 const { round } = require('../math');
+const { updateClientPlayerData } = require('../utils')
 
 const resistanceCron = async (io) => {
 
   try {
     console.log("EXECUTING RESISTENCE CRON");
     const loyalAcolytes = await getLoyalAcolytes();
-    loyalAcolytes.forEach(weakenAcolyte);
-
+    loyalAcolytes.forEach(acolyte => weakenAcolyte(acolyte, io));
   } catch (error) {
     console.log("Error in resistance cron: ", error);
   }
 }
 
-const weakenAcolyte = async (acolyte) => {
+const weakenAcolyte = async (acolyte, io) => {
 
   console.log(`UPDATING ATTRIBUTES OF ${acolyte?.nickname}`);
-  
-  if (!acolyte.attributes.resistence === undefined) {
+   
+  if (!acolyte?.attributes?.resistence === undefined) {
     throw new Error("Could not find attribute resistence on player");
   }
 
@@ -45,7 +45,10 @@ const weakenAcolyte = async (acolyte) => {
     const newInsanity = round(insanity + (insanity * insanityPercentage));
 
     weakenedPlayer = await updateAttribute(weakenedPlayer.email, "insanity", newInsanity);
-  }
+  } 
+
+  // Update the sicken player's 'playerData' context value.
+  await updateClientPlayerData(acolyte.email, io);  
 
 }
 
