@@ -19,6 +19,7 @@ const {createMessageForPushNotification} = require('./src/messages/messagePushNo
 // Cron
 const { resistanceCron } = require('./src/utils/crons/resistanceCron')
 const { sickenCron } = require('./src/utils/crons/sickenCron')
+const { updateClientPlayerData } = require('./src/utils/utils')
 
 // ------------------------------------- //
 // -----   GENERAL CONFIGURATION   ----- //
@@ -64,6 +65,12 @@ const artefactsRoutes = require('./src/routes/ArtefactRoutes');
 
 // Middleware to parse JSON
 app.use(express.json());
+
+// attach io to req to be able to use it in the RestAPI.
+app.use((req, res, next) => {
+  req.io = io;
+  next();
+});
 
 // Route API
 app.use('/api/token', authRoutes);
@@ -407,6 +414,19 @@ io.on("connection", (socket) => {
     }
   }) 
 
+  ////////////////////////////////////////////////////////////////////////////////////////
+  
+  // ---------- TESTING ! ---------------- //
+  
+  socket.on("refresh", async () => {
+    await updateClientPlayerData('julen.izeta@ikasle.aeg.eus', io);
+  });
+
+  socket.on("sicken", async () => {
+    await sickenCron(io);
+  });
+
+
 }); 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -430,12 +450,20 @@ io.on("connection", (socket) => {
 // -----   CRON JOBS   ------ //
 // --------------------------- //
 
+ 
 cron.schedule('*/30 * * * *', async () => {
   console.log('Running cron jobs');
-  await resistanceCron();
-  await sickenCron();
+  await resistanceCron(io);
+  await sickenCron(io);
 });
-
+ 
+// ---------- TESTING ! ---------------- //
+// (async () => {
+//   await sickenCron(io);
+ 
+//   // const player = await findPlayerByEmail('julen.izeta@ikasle.aeg.eus');
+//   // await updateClientPlayerData(player.email, io);
+// })();
 
 // --------------------------- //
 // -----   RUN SERVER   ------ //
