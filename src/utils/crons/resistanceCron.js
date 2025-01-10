@@ -1,5 +1,5 @@
 
-const { getLoyalAcolytes, updateAttribute } = require('../../database/Player')
+const { getLoyalAcolytes, updateAttribute, getAllAcolytes } = require('../../database/Player')
 const { round } = require('../math');
 const { updateClientPlayerData } = require('../utils')
 
@@ -7,8 +7,8 @@ const resistanceCron = async (io) => {
 
   try {
     console.log("EXECUTING RESISTENCE CRON");
-    const loyalAcolytes = await getLoyalAcolytes();
-    for (const acolyte of loyalAcolytes) {
+    const acolytes = await getAllAcolytes();
+    for (const acolyte of acolytes) {
       await weakenAcolyte(acolyte, io);
     }
   } catch (error) {
