@@ -77,7 +77,7 @@ const updateOrCreate = async (req, res) => {
       // Preserve isBetrayer from the existing player
       const updatedPlayerData = {
         ...kaotikaPlayerData, // Spread the incoming kaotika's player data
-        inventory: dbPlayerData.inventory,// Override attributes with the value from the our database.
+        // inventory: dbPlayerData.inventory,// Override attributes with the value from the our database.
         attributes: dbPlayerData.attributes, // Override attributes with the value from the our database.
         //isBetrayer: dbPlayerData.isBetrayer, // Override isBetrayer with the value from the our database.
       };
