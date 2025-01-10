@@ -8,7 +8,9 @@ const resistanceCron = async (io) => {
   try {
     console.log("EXECUTING RESISTENCE CRON");
     const loyalAcolytes = await getLoyalAcolytes();
-    loyalAcolytes.forEach(acolyte => weakenAcolyte(acolyte, io));
+    for (const acolyte of loyalAcolytes) {
+      await weakenAcolyte(acolyte, io);
+    }
   } catch (error) {
     console.log("Error in resistance cron: ", error);
   }
@@ -18,13 +20,13 @@ const weakenAcolyte = async (acolyte, io) => {
 
   console.log(`UPDATING ATTRIBUTES OF ${acolyte?.nickname}`);
    
-  if (!acolyte?.attributes?.resistence === undefined) {
+  if (acolyte?.attributes?.resistence == null) { // Verifica tanto null como undefined
     throw new Error("Could not find attribute resistence on player");
   }
 
   // Decrease resistance
   const currentResistence = acolyte.attributes.resistence;
-  const newResistence = round(currentResistence * 0.9) || 0;
+  const newResistence = currentResistence * 0.9 || 0;
   let weakenedPlayer = await updateAttribute(acolyte.email, "resistence", newResistence);
 
   // Apply penalities.
@@ -37,12 +39,13 @@ const weakenAcolyte = async (acolyte, io) => {
 
     const insanity = weakenedPlayer.attributes.insanity;
 
-    if (!insanity) {
-      throw new Error("Could not find attribute insanity in no player");
+    if (insanity === undefined || insanity === null) {
+      throw new Error("Could not find attribute insanity in the player");
     }
 
-    const insanityPercentage = 50 - newResistence;
-    const newInsanity = round(insanity + (insanity * insanityPercentage));
+    const insanityPercentage = 50 - newResistence; // Porcentaje de incremento
+    const incrementFactor = insanityPercentage / 100; // Convertir a decimal
+    const newInsanity = insanity * (1 + incrementFactor);
 
     weakenedPlayer = await updateAttribute(weakenedPlayer.email, "insanity", newInsanity);
   } 
@@ -56,15 +59,15 @@ const applyPenalty = async (player, attribute) => {
 
   try {
 
-    if (!player.attributes[attribute] === undefined) {
+    if (typeof player.attributes[attribute] === 'undefined') {
       throw new Error(`Could not find attribute ${attribute} in player.`);
     }
 
     const resistence = player.attributes.resistence;
     const attributeValue = player.attributes[attribute];
-    const newAttribute = round(attributeValue * resistence / 100) || 0;
+    const newAttribute = attributeValue * resistence / 100 || 0;
 
-    const updatedPlayer = updateAttribute(player.email, attribute, newAttribute);
+    const updatedPlayer = await updateAttribute(player.email, attribute, newAttribute);
 
     return updatedPlayer;
 
