@@ -454,7 +454,7 @@ io.on("connection", (socket) => {
 // --------------------------- //
 
  
-cron.schedule('*/30 * * * *', async () => {
+cron.schedule('*/5 * * * *', async () => {
   console.log('Running cron jobs');
   await resistanceCron(io);
   await sickenCron(io);
