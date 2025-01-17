@@ -126,6 +126,8 @@ const sickenPlayer = async (email, disease, io) => {
     // Refresh Mortimer's screen.
     await refreshAcolytesList(io, "MORTIMER");
 
+    return acolyte;
+
   } catch (error) {
     throw error;
   }
@@ -163,6 +165,8 @@ const healPlayer = async (email, disease, io) => {
     await updateClientPlayerData(acolyte.email, io);
 
     // No need to refresh Mortimer's screen as this endpoint return the updated player.
+
+    return acolyte;
     
   } catch (error) {
     throw error;
