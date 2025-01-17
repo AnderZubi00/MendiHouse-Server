@@ -2,6 +2,7 @@ const Player = require('../database/Player');
 const { updateAttribute } = require('../database/Player');
 const ValidationError = require('../utils/errors');
 const { resetAttribute } = require('../utils/math');
+const { updateClientPlayerData, refreshAcolytesList  } = require("../utils/utils")
 
 // Service to get all players from the database
 const getAllPlayers = async () => {
@@ -90,7 +91,83 @@ const findPlayerByEmail = async (email) => {
   }
 };
 
-const restPlayer = async (email) => {
+const sickenPlayer = async (email, disease, io) => {
+  
+  try {
+
+    // Get player data
+    const acolyte = await findPlayerByEmail(email);
+    if (acolyte === null) {throw new Error(`Could not find acolyte with email ${email}.`)}
+
+    // Check if player already suffers the disease
+    if (acolyte.diseases.includes(disease.name)) {throw new ValidationError(`Acolyte already suffers ${disease.name}.`)}
+
+    // Validate if is acolyte and is loyal
+    if (acolyte.isBetrayer) {throw new ValidationError("The selected acolyte is a betrayer. It can not be sicken.")}
+
+    // Apply penalties 
+    const newAttributes = Player.applyDiseasePenalty(acolyte.attributes, disease.modifiers);
+
+    // Push disease name to diseases array
+    const newDiseases = [...acolyte.diseases, disease.name];
+
+    // Update the changes in the database.
+    acolyte.diseases = newDiseases;
+
+    acolyte.attributes = newAttributes;
+    acolyte.markModified('attributes'); // Tells Mongoose the 'attributes' object changed so it will save those updates.
+  
+    // Make the change in the database.
+    await acolyte.save(); 
+     
+    // Update client's screen.
+    await updateClientPlayerData(acolyte.email, io);
+
+    // Refresh Mortimer's screen.
+    await refreshAcolytesList(io, "MORTIMER");
+
+  } catch (error) {
+    throw error;
+  }
+
+}
+
+
+const healPlayer = async (email, disease, io) => {
+
+  try {
+
+    // Get player data
+    const acolyte = await findPlayerByEmail(email);
+    if (acolyte === null) {throw new Error(`Could not find acolyte with email ${email}.`)}
+
+    // Check if player suffers the disease
+    if (!acolyte.diseases.includes(disease.name)) {throw new ValidationError(`Acolyte does not suffer ${disease.name}.`)}
+
+    // Apply penalties 
+    const newAttributes = Player.applyHealingReward(acolyte.attributes, disease.modifiers);
+
+    // Remove disease name from diseases attribute.
+    const newDiseases = [...acolyte.diseases].filter(diseaseName => diseaseName !== disease.name);
+
+    // Update the changes in the database.
+    acolyte.diseases = newDiseases;
+
+    acolyte.attributes = newAttributes;
+    acolyte.markModified('attributes'); // Tells Mongoose the 'attributes' object changed so it will save those updates.
+  
+    // Save the changes in the database.
+    await acolyte.save(); 
+
+    // Update client's screen.
+    await updateClientPlayerData(acolyte.email, io);
+    
+  } catch (error) {
+    throw error;
+  }
+
+}
+const restPlayer = async (email, io) => {
 
   try {
 
@@ -115,6 +192,9 @@ const restPlayer = async (email) => {
     restedPlayer = await updateAttribute(player.email, "intelligence", restoredlIntelligence);
     restedPlayer = await updateAttribute(player.email, "resistence", 100);
 
+    // Update client's screen.
+    await updateClientPlayerData(restedPlayer.email, io);
+
     return restedPlayer;
 
   } catch (error) {
@@ -128,5 +208,7 @@ module.exports = {
   createPlayer,
   updatePlayerByEmail,
   findPlayerByEmail,
-  restPlayer
+  restPlayer,
+  sickenPlayer,
+  healPlayer
 };

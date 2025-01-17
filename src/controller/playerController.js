@@ -1,8 +1,6 @@
 const playerService = require("../services/playerService");
-const { updatePlayerByEmail, restPlayer } = require("../services/playerService");
-const { toggleIsInsideLabByEmail, findPlayerByEmail, applyDiseasePenalty, applyHealingReward,  } = require("../database/Player");
-const ValidationError = require('../utils/errors');
-const { updateClientPlayerData, refreshAcolytesList } = require('../utils/utils');
+const { updatePlayerByEmail } = require("../services/playerService");
+const { toggleIsInsideLabByEmail  } = require("../database/Player");
 
 const getAllPlayers = async (req, res) => {
 
@@ -188,44 +186,14 @@ const sickenPlayer = async (req, res) => {
     if (!disease) {throw new Error("Disease not provided")}
     if (!disease?.modifiers || typeof disease?.modifiers !== 'object') {throw new Error("Disease does not have an expected structure.")}
 
-    // Get player data
-    const acolyte = await findPlayerByEmail(email);
-    if (acolyte === null) {throw new Error(`Could not find acolyte with email ${email}.`)}
+    const acolyte = await playerService.sickenPlayer(email, disease, io);
 
-    // Check if player already suffers the disease
-    if (acolyte.diseases.includes(disease.name)) {throw new ValidationError(`Acolyte already suffers ${disease.name}.`)}
-
-    // Validate if is acolyte and is loyal
-    if (acolyte.isBetrayer) {throw new ValidationError("The selected acolyte is a betrayer. It can not be sicken.")}
-
-    // Apply penalties 
-    const newAttributes = applyDiseasePenalty(acolyte.attributes, disease.modifiers);
-
-    // Push disease name to diseases array
-    const newDiseases = [...acolyte.diseases, disease.name];
-
-    // Update the changes in the database.
-    acolyte.diseases = newDiseases;
-
-    acolyte.attributes = newAttributes;
-    acolyte.markModified('attributes'); // Tells Mongoose the 'attributes' object changed so it will save those updates.
-  
-    // Make the change in the database.
-    await acolyte.save(); 
-     
-    // Update client's screen.
-    await updateClientPlayerData(acolyte.email, io);
-
-    // Refresh Mortimer's screen.
-    await refreshAcolytesList(io, "MORTIMER");
-
-    // Return the new player data.
+    // Return the new player data. 
     return res.status(200).send({ status: "OK", playerData: acolyte });
 
   } catch (error) {
     console.log("Error sickening player: ", error.message); 
     const errorMessage = error.name === 'ValidationError' ? error.message : `Internal Error: ${error.message}`;  
-    console.log(errorMessage);
     return res.status(500).send({
       status: "FAILED",
       message: errorMessage,    
@@ -247,30 +215,7 @@ const healPlayer = async (req, res) => {
     if (!disease) {throw new Error("Disease not provided")}
     if (!disease?.modifiers || typeof disease?.modifiers !== 'object') {throw new Error("Disease does not have an expected structure.")}
 
-    // Get player data
-    const acolyte = await findPlayerByEmail(email);
-    if (acolyte === null) {throw new Error(`Could not find acolyte with email ${email}.`)}
-
-    // Check if player suffers the disease
-    if (!acolyte.diseases.includes(disease.name)) {throw new ValidationError(`Acolyte does not suffer ${disease.name}.`)}
-
-    // Apply penalties 
-    const newAttributes = applyHealingReward(acolyte.attributes, disease.modifiers);
-
-    // Remove disease name from diseases attribute.
-    const newDiseases = [...acolyte.diseases].filter(diseaseName => diseaseName !== disease.name);
-
-    // Update the changes in the database.
-    acolyte.diseases = newDiseases;
-
-    acolyte.attributes = newAttributes;
-    acolyte.markModified('attributes'); // Tells Mongoose the 'attributes' object changed so it will save those updates.
-  
-    // Save the changes in the database.
-    await acolyte.save(); 
-
-    // Update client's screen.
-    await updateClientPlayerData(acolyte.email, io);
+    const acolyte = await playerService.healPlayer(email, disease, io);
 
     // Return the new player data.
     return res.status(200).send({ status: "OK", playerData: acolyte });
@@ -296,11 +241,8 @@ const rest = async (req, res) => {
 
     if (!email || typeof email !== "string") {throw new Error("Email field is not valid!")}
 
-    const restedPlayer = await restPlayer(email);
+    const restedPlayer = await playerService.restPlayer(email, io);
     
-    // Update client's screen.
-    await updateClientPlayerData(restedPlayer.email, io);
-
     return res.status(200).send({ status: "OK", restedPlayer: restedPlayer });
 
   } catch (error) {
