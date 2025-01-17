@@ -2,7 +2,7 @@ const playerService = require("../services/playerService");
 const { updatePlayerByEmail, restPlayer } = require("../services/playerService");
 const { toggleIsInsideLabByEmail, findPlayerByEmail, applyDiseasePenalty, applyHealingReward,  } = require("../database/Player");
 const ValidationError = require('../utils/errors');
-const { updateClientPlayerData } = require('../utils/utils');
+const { updateClientPlayerData, refreshAcolytesList } = require('../utils/utils');
 
 const getAllPlayers = async (req, res) => {
 
@@ -215,6 +215,9 @@ const sickenPlayer = async (req, res) => {
      
     // Update client's screen.
     await updateClientPlayerData(acolyte.email, io);
+
+    // Refresh Mortimer's screen.
+    await refreshAcolytesList(io, "MORTIMER");
 
     // Return the new player data.
     return res.status(200).send({ status: "OK", playerData: acolyte });

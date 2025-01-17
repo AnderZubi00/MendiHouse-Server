@@ -1,6 +1,6 @@
 
 const { updateAttribute, getAllAcolytes } = require('../../database/Player')
-const { updateClientPlayerData } = require('../utils')
+const { updateClientPlayerData, refreshAcolytesList } = require('../utils')
 
 const resistanceCron = async (io) => {
 
@@ -51,6 +51,9 @@ const weakenAcolyte = async (acolyte, io) => {
 
   // Update the sicken player's 'playerData' context value.
   await updateClientPlayerData(acolyte.email, io);  
+
+  // Refresh Mortimer's screen.
+  await refreshAcolytesList(io, "MORTIMER");
 
 }
 

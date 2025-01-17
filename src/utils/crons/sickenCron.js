@@ -1,5 +1,5 @@
 const { getLoyalAcolytes } = require('../../database/Player')
-const { updateClientPlayerData } = require('../../utils/utils')
+const { updateClientPlayerData, refreshAcolytesList } = require('../../utils/utils')
 
 const epicDiseases = [
   {
@@ -48,6 +48,9 @@ const sickenCron = async (io) => {
 
     // Update the sicken player's 'playerData' context value.
     await updateClientPlayerData(acolyte.email, io);  
+
+    // Refresh Mortimer's screen.
+    await refreshAcolytesList(io, "MORTIMER");
  
   } catch (error) {
     console.log("Error in sicken cron: ", error);

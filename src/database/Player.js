@@ -234,7 +234,7 @@ const findPlayersByRole = async (role) => {
     }
 
     console.log(`Players found with '${role}' role:`);
-    players.map(player => {
+    players.forEach(player => {
       console.log(` - ${player.email}`);
     });
 

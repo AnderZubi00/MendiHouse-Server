@@ -195,11 +195,38 @@
 
   }
 
+  const refreshAcolytesList = async (io, role) => {
+
+    // Send socket to a certain role to send a socket 'refreshAcolytesList'.
+    try {
+
+      console.log("==== EXECUTING 'refreshCureRoomAcoltyes()' ====");
+      
+      if (!io) { throw new Error("io object not provided.") }
+      if (!role) { throw new Error("role not provided.") }
+
+      const notifiedPlayers = await findPlayersByRole(role);
+      if (!notifiedPlayers) {console.log(`No player with role ${role} found in database.`); return}
+
+      notifiedPlayers.forEach(notifiedPlayer => {
+        if (!notifiedPlayer?.socketId) {console.log(`${notifiedPlayer.nickname} does not have a socketId in database`)}
+        io.to(notifiedPlayer?.socketId).emit("refreshAcolytesList", {});
+        console.log(`Update socket sent to ${notifiedPlayer.nickname} successfully.`)
+      });
+
+    } catch (error) {
+      console.log("Error in function 'refreshCureRoomAcoltyes()': ", error)
+      throw error;
+    }
+
+  }
+
   module.exports = {
     toggleAcolyteInsideTower,
     sendPushNotification,
     getPlayerScreen,
     isPlayerInsideTowerScreens,
     getPlayersInsideHall,
-    updateClientPlayerData
+    updateClientPlayerData,
+    refreshAcolytesList
   }
