@@ -454,11 +454,11 @@ io.on("connection", (socket) => {
 // --------------------------- //
 
  
-cron.schedule('*/5 * * * *', async () => {
-  console.log('Running cron jobs');
-  await resistanceCron(io);
-  await sickenCron(io);
-});
+// cron.schedule('*/5 * * * *', async () => {
+//   console.log('Running cron jobs');
+//   await resistanceCron(io);
+//   await sickenCron(io);
+// });
  
 // ---------- TESTING ! ---------------- //
 // (async () => {
